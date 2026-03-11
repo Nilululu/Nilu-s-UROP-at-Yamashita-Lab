@@ -4,10 +4,16 @@ Created on Mon Feb 23 15:41:13 2026
 
 @author: nilof
 """
+"""
+This script uses gtf files, extracts the relevent information and 
+stores it in the genome and gene classes
+"""
+
 from genome_gene_classes import Genome, Gene
 
+
 def extract_genome_info(genome_file):
-    genome_text = open(genome_file, "r") 
+    genome_text = open(genome_file, "r")  #reading the file
     genome_id=""
     
     
@@ -43,10 +49,11 @@ def extract_genome_info(genome_file):
             
         # --- CASE 2: exon inside current gene ---  # 
         elif feature == "exon" and current_gene is not None:
-            current_gene.axons.append((start, end))
+            current_gene.exons.append((start, end))
 
     # save last gene
     if current_gene is not None:
         genome.add_gene(current_gene)
         
     print("number of gene objects created", genome.get_num_genes())
+    return genome
