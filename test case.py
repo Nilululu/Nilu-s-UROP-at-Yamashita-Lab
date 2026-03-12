@@ -13,8 +13,6 @@ from extract import get_genome_giant_introns
 
 genomes= extract_genome_info("genomic.gtf")  #returns a dictionary of genomes
 
-#creates a histogram with number of giant introns of a genome
-#returns the giant_introns_list
 
 for genome in genomes.values():
      B= get_genome_giant_introns(genome, 3000)
