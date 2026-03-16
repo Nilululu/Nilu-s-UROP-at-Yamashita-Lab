@@ -9,53 +9,83 @@ stores it in the genome and gene classes
 """
 
 import matplotlib.pyplot as plt
+import typing
+
+# Style: when defining a variable the "=" sign should have one white space around.
+genomes = {}  # a dictionary to stores genomes
+
+def parse_attr_fields(text):
+    """ 
+    Parse the last field of a gtf ( the attributes fields) and return a dict key: value.
+
+    use the fact that gtf attribute keys are supposed to be in snake case.
+
+    :param str text: the attribute fields as a string
+    :return: the key value dictionnary
+    :rtype: dict[str, str]
+    """
+    results = {}
+    spt = text.strip().split(";")
+    for element in spt:
+        if element: # test if the string is not empty may happend.
+            (key, value) = element.split(maxsplit=1)
+            results[key.strip()] = value.replace('"', "").strip() # strip may be useless here not sure
+            # replae is just for the style. 
+    return results
 
 
-genomes= {}  # a dictionary to stores genomes
 
-def extract_genome_info(genome_file):
+def extract_genome_info(gtf_file):
     #openning the file
-    genome_text = open(genome_file, "r")  #reading the file
-    genome_id=""
-    
-    
-    #get the genome ID from line 3
-    for i, line in enumerate(genome_text, start= 1):
-        if i==3:
-            genome_id= line
-            break
-    
+    # I would recoment you use a context manager while working with file 
+    # it may save you some issue in the future!
+    # also your variable name are a bit confusing, 
+    # I know that is a bit hard when english is not your native languages.
+    # but genome_file is okayish it is an approximation gtf_file would be more appropriate.
+    # but genome_text is straight up wrong and this is a variable that point to the opened file (called a handle) not the text
+    #opening the file 
+
     # a dict of genes for the genome
-    genes = {}   
-    
-    #extracting genes and exons
-    for line in genome_text:
-        
-        #skipping informational lines
-        if line.startswith("#"):
-            continue
-        
-        fields = line.strip().split("\t")
-        feature = fields[2]
-        start = int(fields[3])
-        end = int(fields[4])
-        info_text = fields[8]   
-        info_text = info_text.strip().strip(";")  # to clena the end of theline ;
-        
-        
+    genes = {}       
+    genome_id = None
+
+    with open(gtf_file, "r") as open_gtf:
+
+        # I would recommend testing you have the correct line,
+        # that way you don't even have to do it in two times.
+        for line in open_gtf:
+            if line.startswith("#"):# comment or info!
+                if line.startswith("#!genome-build-accession"):
+                    # also that will extract the genome_id not the full line.
+                    # it use split() and strip() to grap the text after the first space whithout the line return.
+                    genome_id = line.strip().split(maxsplit=1)[1] 
+                continue
+                
+            fields = line.strip().split("\t")
+            feature = fields[2]
+            start = int(fields[3])
+            end = int(fields[4])
+            info_text = fields[8]   
+            attributes = parse_attr_fields(info_text)
+            #info_text = info_text.strip().strip(";")  # to clena the end of theline ;
+
 
         # #skipping other features we don't need 
         #(for some reason no feature passes this block, even exon or gene)
         # if feature != "exon" or "gene":
         #     continue
         
+        # you cannot do that at all... you are making you vulnerable to 
+        # the order may change between file and event inside a file.
+        # that is why I was suggesitng using a funciton that parse that.
         #info text contains many parameters we don't need
         #we only store gene and transcripts id for each gene and exon
-        info_list= info_text.split("; ")
-        gene_id = info_list[0].split(" ")[1]
-        transcript_id = info_list[1].split(" ")[1]
+        #info_list= info_text.split("; ")
+        #gene_id = info_list[0].split(" ")[1]
+        #transcript_id = info_list[1].split(" ")[1]
         
-        
+        gene_id = attributes["gene_id"]
+
         #stores the gene_id as a dict with relevent keys
         if feature == "gene":
             if gene_id not in genes:
@@ -68,14 +98,18 @@ def extract_genome_info(genome_file):
             
         
         if feature == "exon":
-            
+            transcript_id = attributes["transcript_id"]
             #storing exon positions in its appropraite transcript
             if transcript_id not in genes[gene_id]["transcripts"]:
                 genes[gene_id]["transcripts"][transcript_id] = []
-            
             genes[gene_id]["transcripts"][transcript_id].append((start, end))
         
-           
+    # so the nice thing with the way I showing you to read file is that you don't have to remeber to close them.
+    # they close automatically as soon as you end the matching identation.
+    return (genome_id, genes)
+# I don't think that belongs to this function 
+# you should make a new one.
+def compute_intron(genes):
     #calculating introns from exon junction    
     for gene in genes.values():
         
@@ -90,17 +124,30 @@ def extract_genome_info(genome_file):
                     intron_start= int(exons[i][1])
                     intron_end= int(exons[i+1][0])
                     gene["introns"].add((intron_start, intron_end))
-   
-    genomes[genome_id]= genes
+    
+    return genes
+    # here you only reading one file 
+    # if you want to keep track of multiple genome using a dictionany is a good idea, 
+    # but it should not be here
+    #genomes[genome_id]= genes
     
     #there is a problem here that should be fixed later
     #does this function creates a new genomes dict everytime or reuses the same one
-    return genomes
+    #return genomes
 
+# by splitting it like I do it may seems unecessary but it will make the code easier to follow and write when we will have
+# to write the parser for everything.
 
+# so you may want to make a main function now()
+# this will be very convenient if we want to use that in a CLI or to call it from outside (as a module)
 
+def main(gtf_file, threshold):
+    (genome_id, genes) = extract_genome_info(gtf_file=gtf_file)
+    get_genome_giant_introns(genes, genome_id, threshold)
 
-def get_genome_giant_introns(genome, threshold):
+# try to be consistant with your naming convention
+# is it genes or genome?
+def get_genome_giant_introns(genome, genome_id, threshold):
     
     giant_introns = []
     
@@ -127,6 +174,7 @@ def get_genome_giant_introns(genome, threshold):
                     distance_from_end.append(end_distance)
             else:
                 continue
+    # ok let's talk about layout next time!
     fig, ax = plt.subplots(1)  #for intron lenghts  
     fig1, ax1 = plt.subplots(1)  #for introns distance from gene start
     fig2, ax2 = plt.subplots(1)  #for introns distance from gene end
@@ -147,6 +195,8 @@ def get_genome_giant_introns(genome, threshold):
 
     cbar = plt.colorbar(sc)
     cbar.set_label('Intron Lengths')
+
+    plt.title(genome_id)
    
     plt.tight_layout()
     plt.show()
