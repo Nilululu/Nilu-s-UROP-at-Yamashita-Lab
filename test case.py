@@ -13,12 +13,26 @@ from extract import extract_genome_info
 from extract import get_genome_giant_introns
 from extract import main
 from extract import compute_intron
+import pathlib
 
 
-genome_id, genes, giant_introns= main("genomic.gtf", 3000)
+# for each line open the location given for each genome's gtf file
+#extract information from gtf
+#add the extracted information to a dictionary
+#use that dictionary to ask big picture questions 
+genomes ={}
 
-print(genome_id, giant_introns)
+# read the cvs 
+csv_file = "genomic_directory.csv"
 
-###gene_id "GUITHDRAFT_53115"; transcript_id "XM_005842043.1"
+with open(csv_file, mode = 'r') as directory:
+    lines = directory.readlines()
 
-print(genes["GUITHDRAFT_53115"])
+    for line in lines:
+       
+        name, gtf_loc = line.split(",")
+        genome = main(pathlib.Path(gtf_loc), 3000)
+        genome[name]= genome
+        
+    
+

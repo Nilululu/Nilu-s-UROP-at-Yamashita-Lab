@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This script uses gtf files, extracts the relevent information and 
-stores it in the genome and gene classes
+stores it in a dictionary format
 Created on Mon Feb 23 15:41:13 2026
 
 @author: nilof
@@ -84,7 +84,10 @@ def extract_genome_info(gtf_file):
                     genes[gene_id]["position"]= (start, end)
                     genes[gene_id]["introns"]= set()
                 
-            
+            if gene_id == "unassigned_gene_1":
+                print("problem here")
+                print(attributes["transcript_id"])
+                print(genes[gene_id])
             
         
             if feature == "exon":
@@ -167,12 +170,13 @@ def get_genome_giant_introns(genome, genome_id, threshold):
                     distance_from_end.append(end_distance)
             else:
                 continue
-        
-    create_hist(giant_introns, "giant intron lenghts")
-    create_hist(distance_from_start, "distance from start")
-    create_hist(distance_from_end, "distance from end")
-    create_scatter(distance_from_start, distance_from_end, giant_introns, "", "", "", "z_label")
-    
+    if giant_introns:
+        create_hist(giant_introns, "giant intron lenghts")
+        create_hist(distance_from_start, "distance from start")
+        create_hist(distance_from_end, "distance from end")
+        create_scatter(distance_from_start, distance_from_end, giant_introns, "", "", "", "z_label")
+    else:
+        print ("No giant introns with the current threshold of", threshold)
     return giant_introns
 
 def main(gtf_file, threshold):
