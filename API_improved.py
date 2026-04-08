@@ -16,6 +16,7 @@ step = 5   #is supposed to be 10
 directory_dict = dict() #to store genome names and genomic.gtf locatiosn
 p = pathlib.Path.cwd() #defining the current folder
 start = time.time()
+id_set= ()
 
 
 # base url for downloading 
@@ -31,6 +32,18 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
     lines = refseq_eukaryots.readlines()
 
     for line_n, line in enumerate(lines[1:]):
+        
+        # download the file in the main_folder
+        field= line.split("\t")
+        id_= field[1]  # ge the id from the line
+        if id_ in id_set:
+            continue
+
+        id_set.add(id_)
+        name = field[3]
+        while time.time() - start < 0.3:
+            time.sleep(0.1)
+            
         main_folder = line_n // step
         sub_folder = line_n % step
         top = line_n // step_2
@@ -43,12 +56,6 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         main_folder_path = top_folder_path / 'main_{}'.format(str(main_folder))
         main_folder_path.mkdir(exist_ok=True)
         
-        # download the file in the main_folder
-        field= line.split("\t")
-        id_= field[1]  # ge the id from the line
-        name = field[3]
-        while time.time() - start < 0.3:
-            time.sleep(0.1)
     
         
         this_url = base_url.format(id_)
