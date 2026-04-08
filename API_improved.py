@@ -37,6 +37,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         field= line.split("\t")
         id_= field[1]  # ge the id from the line
         if id_ in id_set:
+            print("duplicated_id:", id_)
             continue
 
         id_set.add(id_)
