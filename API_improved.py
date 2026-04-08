@@ -16,7 +16,7 @@ step = 5   #is supposed to be 10
 directory_dict = dict() #to store genome names and genomic.gtf locatiosn
 p = pathlib.Path.cwd() #defining the current folder
 start = time.time()
-id_set= ()
+id_set= set()
 
 
 # base url for downloading 
