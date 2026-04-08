@@ -85,7 +85,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             dict_key = name + "_genome"
             dict_val = genome_file[0]
             directory_dict[dict_key]= dict_val
-        if line_n > 20:  # for testing porpuses 
+        if line_n > 100:  # for testing porpuses 
             break
     
 
