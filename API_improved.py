@@ -16,7 +16,7 @@ step = 5   #is supposed to be 10
 directory_dict = dict() #to store genome names and genomic.gtf locatiosn
 p = pathlib.Path.cwd() #defining the current folder
 start = time.time()
-id_set= set()
+id_set = set()
 
 
 # base url for downloading 
@@ -26,18 +26,21 @@ base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/downloa
 base_dir = pathlib.Path(p/ "ncbi_data_directory")
 base_dir.mkdir(exist_ok=True)   #creating the directory if not already created
 
+line_n = 0
 
 with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
     
     lines = refseq_eukaryots.readlines()
 
-    for line_n, line in enumerate(lines[1:]):
-        
+    for line in lines[1:]:
+        print(id_set)
         # download the file in the main_folder
         field= line.split("\t")
         id_= field[1]  # ge the id from the line
         if id_ in id_set:
             print("duplicated_id:", id_)
+            continue
+        if id_.startswith("GCA"):
             continue
 
         id_set.add(id_)
@@ -48,7 +51,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         main_folder = line_n // step
         sub_folder = line_n % step
         top = line_n // step_2
-        
+        line_n +=1
         # makdir a folder with top_folder
         top_folder_path =  base_dir / 'top_{}'.format(str(top))
         top_folder_path.mkdir(exist_ok=True)
