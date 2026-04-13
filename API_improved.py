@@ -24,7 +24,7 @@ base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/downloa
 
 #base directory for storing
 base_dir = pathlib.Path(p/ "ncbi_data_directory")
-base_dir.mkdir(exist_ok=True)   #creating the directory if not already created
+base_dir.mkdir(exist_ok = True)   #creating the directory if not already created
 
 line_n = 0
 
@@ -33,14 +33,13 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
     lines = refseq_eukaryots.readlines()
 
     for line in lines[1:]:
-        print(id_set)
-        # download the file in the main_folder
+        
         field= line.split("\t")
         id_= field[1]  # ge the id from the line
         if id_ in id_set:
-            print("duplicated_id:", id_)
+            print("duplicated_id:", id_)   #adressing potentil repeats 
             continue
-        if id_.startswith("GCA"):
+        if id_.startswith("GCA"):    #skipping non-refseq annotated gtfs
             continue
 
         id_set.add(id_)
@@ -51,7 +50,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         main_folder = line_n // step
         sub_folder = line_n % step
         top = line_n // step_2
-        line_n +=1
+        line_n += 1
         # makdir a folder with top_folder
         top_folder_path =  base_dir / 'top_{}'.format(str(top))
         top_folder_path.mkdir(exist_ok=True)
@@ -66,7 +65,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         response = requests.get(this_url)
         file_path = main_folder_path /  '{}_genome.zip'.format(name)
     
-        if response.status_code == 200:
+        if response.status_code == 200:    # download the file in the main_folder
             with open(file_path, 'wb') as file:
                 file.write(response.content)
             print('File downloaded successfully')
@@ -79,10 +78,9 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         zip_path = file_path
         extract_dir = file_path.parent / file_path.name.replace(".zip", "")
         
-        
+        #unziiping the downloaded file
         with zipfile.ZipFile(zip_path, 'r') as z:
             z.extractall(extract_dir)
-        
         
         # Search inside extracted folder for genomic.gtf
         genome_file = list(extract_dir.rglob("genomic.gtf"))
@@ -96,9 +94,13 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             dict_key = name + "_genome"
             dict_val = genome_file[0]
             directory_dict[dict_key]= dict_val
-        if line_n > 100:  # for testing porpuses 
+        
+        file_path.unlink()
+        #deleting the zip folder !!!!!!!
+        
+        if line_n > 20:  # for testing porpuses 
             break
-    
+        
 
     csv_file_name = "genomic_directory.csv"
 
