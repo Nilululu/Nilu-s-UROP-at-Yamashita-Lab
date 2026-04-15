@@ -1,7 +1,7 @@
 """
 Creates histograms and scatter plots using matplotlib
 """
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -19,7 +19,8 @@ def create_hist( data, title):
 
     """
     if not isinstance(data, list):
-        raise TypeError("Error: the data given is not in a list format")
+        if not isinstance(data, np.ndarray):
+            raise TypeError("Error: the data given is not in list or numpy array format")
     if not isinstance(title, str):
         raise TypeError("Error: title should be a string")
     fig, ax = plt.subplots(1)
@@ -40,7 +41,9 @@ def create_scatter (x, y, z, title, x_label, y_label, z_label):
     """
     
     if not isinstance(x, list):
-        raise TypeError("Error: the input data is not in list format")
+        if not isinstance(x, np.ndarray):
+            raise TypeError("Error: the input data is not in list format")
+   
     
     # if type(title) != str:
         

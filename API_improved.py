@@ -28,7 +28,7 @@ base_dir.mkdir(exist_ok = True)   #creating the directory if not already created
 
 line_n = 0
 
-with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
+with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt", "w") as f_err:
     
     lines = refseq_eukaryots.readlines()
 
@@ -60,17 +60,21 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         main_folder_path.mkdir(exist_ok=True)
         
     
+        try:
+            this_url = base_url.format(id_)
+            response = requests.get(this_url)
+            file_path = main_folder_path /  '{}_genome.zip'.format(name)
         
-        this_url = base_url.format(id_)
-        response = requests.get(this_url)
-        file_path = main_folder_path /  '{}_genome.zip'.format(name)
-    
-        if response.status_code == 200:    # download the file in the main_folder
-            with open(file_path, 'wb') as file:
-                file.write(response.content)
-            print('File downloaded successfully')
-        else:
-            print('Failed to download file')
+            if response.status_code == 200:    # download the file in the main_folder
+                with open(file_path, 'wb') as file:
+                    file.write(response.content)
+                print('File downloaded successfully')
+            else:
+                print('Failed to download file')
+        except:
+            f_err.write(line)
+            continue
+        
         start = time.time()
         
         print(top, main_folder, sub_folder)

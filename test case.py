@@ -18,14 +18,13 @@ from plot_creator import create_hist, create_scatter
 import matplotlib.pyplot as plt
 import numpy as np
 
-# for each line open the location given for each genome's gtf file
-#extract information from gtf
-#add the extracted information to a dictionary
-#use that dictionary to ask big picture questions 
+treshold = 1000
+
 genomes = dict()
 giant_introns_list = []
 start_distance_list = []
 end_distance_list = []
+
 giant_introns_dict = {}
 
 # read the cvs 
@@ -37,56 +36,33 @@ with open(csv_file, mode = 'r') as directory:
     for line in lines:
        
         name, gtf_loc = line.split(",")
-        genome_id, genome, giant_introns_info = main(Path(gtf_loc.strip()), 1000)
+        genome_id, genome, giant_introns_info = main(Path(gtf_loc.strip()), treshold)
         genomes[genome_id]= genome
-        giant_introns, start_distance, end_distance = giant_introns_info
-        giant_introns_list.append(giant_introns)
-        start_distance_list.append(start_distance)
-        end_distance_list.append(end_distance)
-        giant_introns_dict[genome_id] = giant_introns
+        giant_introns_len, start_distance, end_distance = giant_introns_info
+        if giant_introns_len:
+            giant_introns_list.extend(giant_introns_len)
+            start_distance_list.extend(start_distance)
+            end_distance_list.extend(end_distance)
+        giant_introns_dict[genome_id] = np.column_stack((giant_introns_len, start_distance, end_distance))
+        
 
 
-#number of giant introns inside each gene 
-num_g_introns_list = []
+giant_introns = np.column_stack((giant_introns_list, start_distance_list, end_distance_list))
+
+#number of giant introns inside each genome 
+num_g_introns = []
+
 for items in giant_introns_dict:
     
-    num_g_introns = len(giant_introns_dict[items])
-    num_g_introns_list.append(num_g_introns)
-
-print(num_g_introns_list)
-
-
-#asking number of giant introns/num introns for genomes
-intron_ratio= []
-introns = []
-
-for id_ in giant_introns_dict:
-    num_g_introns = len(giant_introns_dict[id_])
-
-for item in genomes.values():
+    g_introns = giant_introns_dict[items].shape[0]
     
-    genome_introns = 0
-    for gene in item.values():
-        num_introns = len(gene['introns'])
-        genome_introns = genome_introns + num_introns
-    introns.append(genome_introns)
+    num_g_introns.append(g_introns)
+
+create_hist(num_g_introns, f"distribution of number of giant_introns in genomes wiht {treshold}kb treshold")
 
 
-a = np.array(num_g_introns_list)
-b = np.array(introns)
-
-intron_ratio = a/b
-intron_ratio = list(intron_ratio)
-
-print("intron ratio", intron_ratio)
-print("mean", np.mean(intron_ratio)*100)
-print("std", np.std(intron_ratio)*100)
 
 create_hist(giant_introns_list, "giant introns lenght distribution")
-create_hist(introns,"number of introns per genome distribution") 
-create_hist(intron_ratio, "ration of giant introns within all introns per genome distribution")
 
-print("dimentions", len(giant_introns_list), len(start_distance_list), len(end_distance_list))
 
-print(start_distance_list, end_distance_list, giant_introns_list)
-# create_scatter(start_distance_list, end_distance_list, giant_introns_list, "title", "start distance", "end distance", "giant intron lenght")
+create_scatter(giant_introns[:,0], giant_introns[:,1], giant_introns[:,2], "title", "start distance", "end distance", "giant intron lenght")
