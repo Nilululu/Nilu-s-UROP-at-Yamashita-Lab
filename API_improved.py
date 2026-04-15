@@ -11,8 +11,8 @@ import pathlib
 import csv
 import zipfile
 
-step_2 = 25  # is supposed to be 800
-step = 5   #is supposed to be 10
+step_2 = 1000  # is supposed to be 800
+step = 100   #is supposed to be 10
 directory_dict = dict() #to store genome names and genomic.gtf locatiosn
 p = pathlib.Path.cwd() #defining the current folder
 start = time.time()
@@ -20,7 +20,7 @@ id_set = set()
 
 
 # base url for downloading 
-base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GTF&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED"
+base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/download?include_annotation_type=GENOME_GTF&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED"
 
 #base directory for storing
 base_dir = pathlib.Path(p/ "ncbi_data_directory")
@@ -43,7 +43,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             continue
 
         id_set.add(id_)
-        name = field[3]
+        name = field[3].replace(" ", "_")
         while time.time() - start < 0.3:
             time.sleep(0.1)
             
