@@ -2,9 +2,7 @@
 """
 This script uses gtf files, extracts the relevent information and 
 stores it in a dictionary format
-Created on Mon Feb 23 15:41:13 2026
-
-@author: nilof
+Created on Mon Feb 23 15:41:13 2026 by nilu
 """
 from plot_creator import create_hist, create_scatter
 import typing

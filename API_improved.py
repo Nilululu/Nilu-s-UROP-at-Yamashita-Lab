@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr  2 15:39:01 2026
-
-@author: nilof
+Created on Thu Apr  2 15:39:01 2026 by nilu
 """
 
 import requests
@@ -102,8 +100,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         file_path.unlink()
         #deleting the zip folder !!!!!!!
         
-        # if line_n > 20:  # for testing porpuses 
-        #     break
+        if line_n > 20:  # for testing porpuses 
+            break
         
 
     csv_file_name = "genomic_directory.csv"
