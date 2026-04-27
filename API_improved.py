@@ -86,13 +86,16 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         
         # Search inside extracted folder for genomic.gtf
         genome_file = list(extract_dir.rglob("genomic.gtf"))
-        print("Found GTF:", genome_file[0])
+        
         
         # Handle potential missing GTF (should not accur though)
         if not genome_file:
-            print(f"No genomic.gtf found for {name}, skipping")
+            print(f"Error: No genomic.gtf found for {name}, skipping")
+            continue
+            
         else:
             #save the location of the genomic file 
+            print("Found GTF:", genome_file[0])
             dict_key = name + "_genome"
             dict_val = genome_file[0]
             directory_dict[dict_key]= dict_val

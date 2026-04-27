@@ -8,15 +8,11 @@ import matplotlib.pyplot as plt
 
 def create_hist( data, title):
     """
-
     Parameters
     data : python list
     title : string
-
-    Raises Error if the data or title are not of expected type
-
+    Raises Error if the data or title are not a string or data is not a list/numpy array
     Returns: None
-
     """
     if not isinstance(data, list):
         if not isinstance(data, np.ndarray):
@@ -33,25 +29,17 @@ def create_hist( data, title):
     
     return
 def create_scatter (x, y, z, title, x_label, y_label, z_label):
+    
     """
-    used for comparing introns relative position to the gene and their length
-
-    Creates a plot and returns None
-
+    Parameters
+    x, y, z : python lists or numoy arrays
+    title and labels: string
+    Returns: None
     """
     
     if not isinstance(x, list):
         if not isinstance(x, np.ndarray):
             raise TypeError("Error: the input data is not in list format")
-   
-    
-    # if type(title) != str:
-        
-    #     raise TypeError("Error: the title is not a string")
-    
-    # if type(x_label) or type(y_label) or type(z_label) != str:
-        
-    #     raise TypeError("Error: the input labels are not all strings")
      
     fig, ax = plt.subplots(1)
     
@@ -69,4 +57,25 @@ def create_scatter (x, y, z, title, x_label, y_label, z_label):
         
     return 
 
+def create_2d_scatter (x, y, title, x_label = None, y_label = None):
+    """
+    Parameters
+    x, y: python lists or numoy arrays
+    title: string
+    Returns: None
+    """
+    
+    fig, ax = plt.subplots(1)
+    
+    ax.scatter(x, y)
+    ax.set_title(title)
 
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    

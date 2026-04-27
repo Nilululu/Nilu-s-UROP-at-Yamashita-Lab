@@ -8,7 +8,7 @@ uses Guilt genome: the smallest genome among eaukaryotes
 from report_reader import get_genome_metadata
 from extract import main
 from pathlib import Path
-from plot_creator import create_hist, create_scatter
+from plot_creator import create_hist, create_scatter, create_2d_scatter
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -64,12 +64,27 @@ create_scatter(giant_introns[:,0], giant_introns[:,1], giant_introns[:,2], "titl
 x_list = []
 y_list = []
 z_list = []
+max_list = []
+mean_list = []
+
 for item in giant_introns_dict:
     x = giant_introns_dict[item]["introns"].shape[0]
     y = giant_introns_dict[item]["length"]
     z = giant_introns_dict[item]["Num_Chr"]
+    try: 
+        max_intron = giant_introns_dict[item]["introns"].max()
+        mean_intron = giant_introns_dict[item]["introns"].mean()
+    except:
+        max_intron = 0
+        mean_intron = 0
+        
     x_list.append(x)
     y_list.append(y)
     z_list.append(z)
+    max_list.append(max_intron)
+    mean_list.append(mean_intron)
+    
 
-create_scatter(x_list, y_list, z_list, "num g introns vs genoe len vs num chr", "num g introns", "genome len", "num chr")
+create_scatter(y_list, x_list, z_list, "genoe len vs num g introns vs num chr", "genome len", "num g introns" , "num chr")
+create_2d_scatter(y_list, max_list, "genome len vs biggest intron")
+create_2d_scatter(y_list, mean_list, "genome len vs mean intron")
