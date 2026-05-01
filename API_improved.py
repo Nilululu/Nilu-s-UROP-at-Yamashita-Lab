@@ -8,6 +8,7 @@ import time
 import pathlib
 import csv
 import zipfile
+import shutil 
 
 step_2 = 1000  # is supposed to be 800
 step = 100   #is supposed to be 10
@@ -81,8 +82,19 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         extract_dir = file_path.parent / file_path.name.replace(".zip", "")
         
         #unziiping the downloaded file
-        with zipfile.ZipFile(zip_path, 'r') as z:
-            z.extractall(extract_dir)
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as z:
+                z.extractall(extract_dir)
+        except zipfile.BadZipFile: 
+            print("Error: Bad zipfile; genome id {id_}, {name}")
+            file_path.unlink()
+            if extract_dir.is_dir():
+                shutil.rmtree(extract_dir)
+                
+            continue 
+        
+        except:
+            raise
         
         # Search inside extracted folder for genomic.gtf
         genome_file = list(extract_dir.rglob("genomic.gtf"))
@@ -91,6 +103,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         # Handle potential missing GTF (should not accur though)
         if not genome_file:
             print(f"Error: No genomic.gtf found for {name}, skipping")
+            file_path.unlink()
+            shutil.rmtree(extract_dir)
             continue
             
         else:
