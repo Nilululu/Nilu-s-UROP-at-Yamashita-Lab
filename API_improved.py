@@ -86,7 +86,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
             with zipfile.ZipFile(zip_path, 'r') as z:
                 z.extractall(extract_dir)
         except zipfile.BadZipFile: 
-            print("Error: Bad zipfile; genome id {id_}, {name}")
+            print(f"Error: Bad zipfile; genome id {id_}, {name}")   ##this is not working!
             file_path.unlink()
             if extract_dir.is_dir():
                 shutil.rmtree(extract_dir)
@@ -117,8 +117,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         file_path.unlink()
         #deleting the zip folder !!!!!!!
         
-        # if line_n > 20:  # for testing porpuses 
-        #     break
+        if line_n > 20:  # for testing porpuses 
+            break
         
 
     csv_file_name = "genomic_directory.csv"

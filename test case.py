@@ -30,7 +30,7 @@ with open(csv_file, mode = 'r') as directory:
     for line in lines:
        
         name, gtf_loc = line.split(",")
-        genome_id, genome, giant_introns_info = main(Path(gtf_loc.strip()), treshold)
+        genome_id, genome, giant_introns_info, taxId = main(Path(gtf_loc.strip()), treshold)
         genomes[genome_id]= genome
         giant_introns_len, start_distance, end_distance = giant_introns_info
         

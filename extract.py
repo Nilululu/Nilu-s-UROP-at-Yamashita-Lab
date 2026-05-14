@@ -6,6 +6,7 @@ Created on Mon Feb 23 15:41:13 2026 by nilu
 """
 from plot_creator import create_hist, create_scatter
 import typing
+import json
 
 
 def parse_attr_fields(text):
@@ -23,6 +24,7 @@ def parse_attr_fields(text):
     
     #the note part of this field would create problems, so I specified spt with 6 max split
     #gene_id "GUITHDRAFT_162030"; transcript_id "XM_005836996.1"; db_xref "InterPro:IPR007257"; db_xref "JGIDB:Guith1_162030"; gbkey "CDS"; locus_tag "GUITHDRAFT_162030"; note "Subunit of the GINS complex; Psf2; Subunit of the GINS complex.  Psf2"; orig_transcript_id "gnl|WGS:AEIE|GUITHDRAFT_mRNA162030"; product "hypothetical protein"; protein_id "XP_005837053.1"; exon_number "1";
+    
     for element in spt:
         try:
             if element: # test if the string is not empty, may happen
@@ -181,6 +183,17 @@ def get_genome_giant_introns(genome, genome_id, threshold, plot = False):
             print ("No giant introns for {genome_id} with the current threshold of", threshold)
     return (giant_introns, distance_from_start, distance_from_end)
 
+def extract_tax_id(gtf_file):
+
+    taxonomy_path = gtf_file.parent.parent / "assembly_data_report.jsonl"
+    
+    with open(taxonomy_path, 'r') as tax_file:
+        for line in tax_file:
+            A = json.loads(line)
+            # print(A)
+            print(A["assemblyInfo"]["biosample"]["description"]["organism"]["taxId"])
+    
+
 def main(gtf_file, threshold, plot = False):
     """
     combines multiple function in module extract to create a dictionary
@@ -204,5 +217,5 @@ def main(gtf_file, threshold, plot = False):
     (genome_id, genes) = extract_genome_info(gtf_file=gtf_file)
     genes= compute_intron(genes)
     giant_introns_info= get_genome_giant_introns(genes, genome_id, threshold, plot)
-
-    return genome_id, genes, giant_introns_info
+    taxId = extract_tax_id(gtf_file)
+    return genome_id, genes, giant_introns_info, taxId
