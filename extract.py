@@ -5,8 +5,31 @@ stores it in a dictionary format
 Created on Mon Feb 23 15:41:13 2026 by nilu
 """
 from plot_creator import create_hist, create_scatter
-import typing
 import json
+
+
+def get_genomeMetadata (gtf_loc):
+    """
+    parameters: jason_file 
+    returns: genome_lenght, num_chromosome, genome_id
+    """
+    jsonl_file = gtf_loc.replace("genomic.gtf", "sequence_report.jsonl").strip()
+    with open (jsonl_file, 'r') as report:
+        
+        lines=report.readlines()
+        length = 0
+        num_chromosome = len(lines)
+        
+        for line in lines:
+            json_dict = json.loads(line)
+            length = length + json_dict["length"]
+        
+        genome_lenght = length
+        genome_id = json_dict["assemblyAccession"]   
+        
+    return (genome_lenght, num_chromosome, genome_id)    
+
+
 
 
 def parse_attr_fields(text):
@@ -38,7 +61,7 @@ def parse_attr_fields(text):
 
 
 
-def extract_genome_info(gtf_file):
+def extract_genesAndId(gtf_file):
     """
     opens a gtf file and store all the genes, with their respective 
     transcripst, introns, and exons in dict
@@ -111,7 +134,6 @@ def compute_intron(genes):
     -----
     parameters: genes : a dictionary 
     returns : genes : a modified dictionary
-    rtype: dicttionary
     
     """
     for gene in genes.values():
@@ -128,11 +150,11 @@ def compute_intron(genes):
                     intron_end= int(exons[i+1][0])
                     gene["introns"].add((intron_start, intron_end))
  
-    return genes
+    return #genes
     
    
 
-def get_genome_giant_introns(genome, genome_id, threshold, plot = False):
+def get_GintronInfo(genome, genome_id, threshold, plot = False):
     """
     extracts giants introns and their relative positions with respect
     to the gene they belong to and stores that information in lists
@@ -183,39 +205,14 @@ def get_genome_giant_introns(genome, genome_id, threshold, plot = False):
             print ("No giant introns for {genome_id} with the current threshold of", threshold)
     return (giant_introns, distance_from_start, distance_from_end)
 
-def extract_tax_id(gtf_file):
+def get_taxId(gtf_file):
 
     taxonomy_path = gtf_file.parent.parent / "assembly_data_report.jsonl"
     
     with open(taxonomy_path, 'r') as tax_file:
         for line in tax_file:
             A = json.loads(line)
-            # print(A)
-            print(A["assemblyInfo"]["biosample"]["description"]["organism"]["taxId"])
+            taxId = A["assemblyInfo"]["biosample"]["description"]["organism"]["taxId"]
+            return taxId
     
 
-def main(gtf_file, threshold, plot = False):
-    """
-    combines multiple function in module extract to create a dictionary
-    out of the gtf_file relevent information, compute introns for the 
-    genome and identify and plot giant introns
-    
-    PARAMETERS:
-    gtf_file 
-        The Gene transfer format (GTF) is a file format used to hold 
-        information about gene structure. It is a tab-delimited 
-        text format 
-    threshhold (int)
-        indicating the cut-off to define a giant intron
-    
-    RETURNS:
-        genome_id (str)
-        genes: python (dict)
-        giant Introns (python list)
-
-    """
-    (genome_id, genes) = extract_genome_info(gtf_file=gtf_file)
-    genes= compute_intron(genes)
-    giant_introns_info= get_genome_giant_introns(genes, genome_id, threshold, plot)
-    taxId = extract_tax_id(gtf_file)
-    return genome_id, genes, giant_introns_info, taxId
