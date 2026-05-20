@@ -78,4 +78,31 @@ def create_2d_scatter (x, y, title, x_label = None, y_label = None):
     plt.tight_layout()
     plt.show()
     
+
+# def create_filtered_hist (genomes_dict, filter_name, filter_rank, question):
+#     """
+
+#     Parameters
+#     ----------
+#     genomes_dict : python dict
+#         gene dic for genomes and gintrons dict of all genomes.
+#     filter_name : str
+#         animals, insects, etc.
+#     filter_rank : str
+#         kingdom, subkingdom, family, etc.
+#     question: str
+#         gintrons, max, mean, num_gintrons, percentile. 
+
+#     Returns
+#     -------
+#     None.
+    
+
+#     """
+    
+#     for keys in genomes_dict:
+#         if genomes_dict [keys]["taxId"][filter_rank] == filter_name:
+            
+#     #filteration 
+    
     

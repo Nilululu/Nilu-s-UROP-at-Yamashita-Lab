@@ -8,12 +8,15 @@ from plot_creator import create_hist, create_scatter
 import json
 
 
+
+
 def get_genomeMetadata (gtf_loc):
     """
     parameters: jason_file 
     returns: genome_lenght, num_chromosome, genome_id
     """
-    jsonl_file = gtf_loc.replace("genomic.gtf", "sequence_report.jsonl").strip()
+    jsonl_file = gtf_loc.parent / "sequence_report.jsonl"
+    
     with open (jsonl_file, 'r') as report:
         
         lines=report.readlines()
@@ -214,5 +217,7 @@ def get_taxId(gtf_file):
             A = json.loads(line)
             taxId = A["assemblyInfo"]["biosample"]["description"]["organism"]["taxId"]
             return taxId
+
     
 
+    
