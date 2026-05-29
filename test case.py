@@ -37,9 +37,9 @@ GenomesGintrons_dict = {}
 genomeId_to_taxonomy = {}
 
 #  file containing all gtf locations
-# csv_file = "all_gtf_downloaded_find.txt"
+csv_file = "all_gtf_downloaded_find.txt"
 
-csv_file = "genomic_directory.csv"    #used on local drive
+# csv_file = "genomic_directory.csv"    #used on local drive
 
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
