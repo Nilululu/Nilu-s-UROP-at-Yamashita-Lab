@@ -97,13 +97,10 @@ def get_style (kingdom, _mapping = dict(), _used = set()):
     #looping until we get a color and shape that has not been used before
     while True:
         color = random.choice(colors)
-        
-        if color in _used:
-            continue
         shape = random.choice(shapes)
-        
-        if shape in _used:
-            continue
+        if color in _used:
+            if shape in _used:
+                continue
         
         _used.add(color)
         _used.add(shape)

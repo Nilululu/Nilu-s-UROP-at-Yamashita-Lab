@@ -12,7 +12,7 @@ from plot_creator import create_hist, create_scatter, create_2d_scatter, get_sty
 import numpy as np
 import taxonomy 
 import matplotlib.pyplot as plt
-
+import math
 #### incorporate the taxonomy module 
 
 # for when I try the script in my local drive
@@ -37,9 +37,9 @@ GenomesGintrons_dict = {}
 genomeId_to_taxonomy = {}
 
 #  file containing all gtf locations
-csv_file = "all_gtf_downloaded_find.txt"
+# csv_file = "all_gtf_downloaded_find.txt"
 
-#cvs_file = "genomic_directory.csv"    #used on local drive
+csv_file = "genomic_directory.csv"    #used on local drive
 
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
@@ -85,12 +85,13 @@ allGenomes_GintronMatrix = np.column_stack((allGenomes_Gintron, allGenomes_Gintr
 
 
 fig, ax = plt.subplots(1)
-# fig1, ax1 = plt.subplots(1)
+fig1, ax1 = plt.subplots(1)
 
 _mapping = dict()
+_kingdom_count = dict()
 
 for genome in GenomesGintrons_dict:
-    print(genome)
+    # print(genome)
     size = GenomesGintrons_dict[genome]["GenomeLength"]
     
     max_intron = 0
@@ -127,13 +128,24 @@ for genome in GenomesGintrons_dict:
     _mapping = get_style(kingdom)
     
     style = _mapping[kingdom]
+    if kingdom not in _kingdom_count:
+        _kingdom_count[kingdom] = 1
+    
+    else:
+        _kingdom_count[kingdom] += 1
     
     # print(size, max_intron, style['color'], style['marker'] )
-    ax.scatter(size, max_intron, color = style['color'], marker = style['marker'])
+    ax.scatter((size*0.001), (max_intron*0.001), color = style['color'], marker = style['marker'])
+    ax.set_title(f"genome size vs max intron (scale = kbp), labels: {_mapping}")
+    ax1.scatter(math.log10(size*0.001), math.log10(max_intron*0.001), color = style['color'], marker = style['marker'] )
+    ax1.set_title("genome size vs max intron (scale = log bp)")
 
 plt.show()  
 print(_mapping)   
     
+fig2, ax2 = plt.subplots(1)
+print(_kingdom_count)
+ax2.pie(_kingdom_count.values(), labels = _kingdom_count.keys())
 
     
     
@@ -143,153 +155,150 @@ print(_mapping)
     
     
 
-# #### Filteration for all questions 
-# filter_name = "Mycota"
-# filter_rank = "kingdom"
-# filteration = True
+#### Filteration for all questions 
+filter_name = "Mycota"
+filter_rank = "kingdom"
+filteration = False
 
-# ### Question 1 = What is the distribution of number of Gintrons in each genome
+### Question 1 = What is the distribution of number of Gintrons in each genome
 
 
 
 
     
-# if filteration == True:
+if filteration == True:
     
-#     filt_numGintrons = []
-#     filter_Gintrons = []
-#     filter_GintronStart = []
-#     filter_GintronEnd = []
-#     filt_GenomeLength = []
-#     filt_Genomes_numChr = []
-#     filt_max_Gintrons = []
-#     filt_mean_Gintrons = []
-#     filt_quantile_list = []
-#     quantile = 0.99
+    filt_numGintrons = []
+    filter_Gintrons = []
+    filter_GintronStart = []
+    filter_GintronEnd = []
+    filt_GenomeLength = []
+    filt_Genomes_numChr = []
+    filt_max_Gintrons = []
+    filt_mean_Gintrons = []
+    filt_quantile_list = []
+    quantile = 0.99
     
-#     for item in GenomesGintrons_dict:
-#         if GenomesGintrons_dict[item]["taxId"][filter_rank] == filter_name:
+    for item in GenomesGintrons_dict:
+        if GenomesGintrons_dict[item]["taxId"][filter_rank] == filter_name:
     
-#             numGintrons = GenomesGintrons_dict[item]["Gintrons"].shape[0]
-#             filt_numGintrons.append(numGintrons)
+            numGintrons = GenomesGintrons_dict[item]["Gintrons"].shape[0]
+            filt_numGintrons.append(numGintrons)
             
-#             Gintron_f = GenomesGintrons_dict[item]["Gintrons"]
-#             filter_Gintrons.extend(Gintron_f[:,0])
-#             filter_GintronStart.extend(Gintron_f[:,1])
-#             filter_GintronEnd.extend(Gintron_f[:,2])
-#             filt_GenomeLength.append(GenomesGintrons_dict [item]["GenomeLength"])
-#             filt_Genomes_numChr.append(GenomesGintrons_dict[item]["Num_Chr"])
+            Gintron_f = GenomesGintrons_dict[item]["Gintrons"]
+            filter_Gintrons.extend(Gintron_f[:,0])
+            filter_GintronStart.extend(Gintron_f[:,1])
+            filter_GintronEnd.extend(Gintron_f[:,2])
+            filt_GenomeLength.append(GenomesGintrons_dict [item]["GenomeLength"])
+            filt_Genomes_numChr.append(GenomesGintrons_dict[item]["Num_Chr"])
             
-#             try: 
-#                 max_Gintron = Gintron_f[:,0].max()
-#                 mean_Gintron = Gintron_f[:,0].mean()
-#                 quantile_Gintron = np.quantile(Gintron_f[:,0], quantile)
-#             except:
-#                 max_Gintron = 0
-#                 mean_Gintron = 0
-#                 quantile_Gintron = 0 
+            try: 
+                max_Gintron = Gintron_f[:,0].max()
+                mean_Gintron = Gintron_f[:,0].mean()
+                quantile_Gintron = np.quantile(Gintron_f[:,0], quantile)
+            except:
+                max_Gintron = 0
+                mean_Gintron = 0
+                quantile_Gintron = 0 
             
             
-#             filt_max_Gintrons.append(max_Gintron)
-#             filt_mean_Gintrons.append(mean_Gintron)
-#             filt_quantile_list.append(quantile_Gintron)
+            filt_max_Gintrons.append(max_Gintron)
+            filt_mean_Gintrons.append(mean_Gintron)
+            filt_quantile_list.append(quantile_Gintron)
             
-#     if filt_numGintrons:
-#         create_hist(filt_numGintrons, f"Q1: distribution of number of giant_introns in genomes (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)")
+    if filt_numGintrons:
+        create_hist(filt_numGintrons, f"Q1: distribution of number of giant_introns in genomes (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)")
         
-#         ### Question 2 = for all Gintrons, what is their length distribution 
+        ### Question 2 = for all Gintrons, what is their length distribution 
         
-#         create_hist(filter_Gintrons, f"Q2: giant introns lenght distribution (filter : {filter_name} {filter_rank},Gintron threshold: {Gintron_treshold}kb)")
+        create_hist(filter_Gintrons, f"Q2: giant introns lenght distribution (filter : {filter_name} {filter_rank},Gintron threshold: {Gintron_treshold}kb)")
           
         
-#         ### Question 3 = Is there a corelation between Gintron length and its distance from two ends of the gene
+        ### Question 3 = Is there a corelation between Gintron length and its distance from two ends of the gene
         
-#         Q3_title  = f"Q3: Gintrons lenght vs Distance from both end of a gene (filter : {filter_name} {filter_rank},Gintron threshold: {Gintron_treshold}kb)"
-#         Q3_xlabel = "Distance from start"
-#         Q3_ylabel = "Distance from end"
-#         Q3_zlabel = "Gintron Lenght"
+        Q3_title  = f"Q3: Gintrons lenght vs Distance from both end of a gene (filter : {filter_name} {filter_rank},Gintron threshold: {Gintron_treshold}kb)"
+        Q3_xlabel = "Distance from start"
+        Q3_ylabel = "Distance from end"
+        Q3_zlabel = "Gintron Lenght"
         
-#         print(filter_Gintrons, filter_GintronStart,filter_GintronEnd)
-#         create_scatter(filter_GintronStart, filter_GintronEnd, filter_Gintrons, Q3_title, Q3_xlabel, Q3_ylabel, Q3_zlabel)
+        print(filter_Gintrons, filter_GintronStart,filter_GintronEnd)
+        create_scatter(filter_GintronStart, filter_GintronEnd, filter_Gintrons, Q3_title, Q3_xlabel, Q3_ylabel, Q3_zlabel)
         
         
         
-#         ## Question 4 = Is there a correlation between genome lenght&number of chromosomes and number of Gintrons, max Gintron, mean GIntron, different quantiles of Gintrons
+        ## Question 4 = Is there a correlation between genome lenght&number of chromosomes and number of Gintrons, max Gintron, mean GIntron, different quantiles of Gintrons
         
-#         create_scatter(filt_GenomeLength, filt_numGintrons, filt_Genomes_numChr, f"Q4.a genome len vs num Gintrons vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "num Gintrons" , "num chr")
-#         create_scatter(filt_GenomeLength , filt_max_Gintrons, filt_Genomes_numChr,  f"Q4b.b Genome len vs biggest Gintron vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
-#         create_scatter(filt_GenomeLength , filt_mean_Gintrons, filt_Genomes_numChr,  f"Q4.c Genome len vs mean Gintron vs num chr wiht (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
-#         create_scatter(filt_GenomeLength , filt_quantile_list, filt_Genomes_numChr,  f"Q4.d Genome len vs {quantile}-th quantile Gintron vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", f"{quantile}-th quantile Gintron" , "num chr")
+        create_scatter(filt_GenomeLength, filt_numGintrons, filt_Genomes_numChr, f"Q4.a genome len vs num Gintrons vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "num Gintrons" , "num chr")
+        create_scatter(filt_GenomeLength , filt_max_Gintrons, filt_Genomes_numChr,  f"Q4b.b Genome len vs biggest Gintron vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
+        create_scatter(filt_GenomeLength , filt_mean_Gintrons, filt_Genomes_numChr,  f"Q4.c Genome len vs mean Gintron vs num chr wiht (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
+        create_scatter(filt_GenomeLength , filt_quantile_list, filt_Genomes_numChr,  f"Q4.d Genome len vs {quantile}-th quantile Gintron vs num chr (filter : {filter_name} {filter_rank}, Gintron threshold: {Gintron_treshold}kb)", "genome len", f"{quantile}-th quantile Gintron" , "num chr")
         
-#         # Q5 what does the above questions look like for different filterations when you take kingdoms and their sub catagpries in mind?
-#         # I need a filteration function !!!
         
-#     else:
-#         print("No genomes found with the current filter") 
-# if filteration == False:
-#     allGenomes_numGintrons = []
+    else:
+        print("No genomes found with the current filter") 
+if filteration == False:
+    allGenomes_numGintrons = []
     
-#     for item in GenomesGintrons_dict:
+    for item in GenomesGintrons_dict:
         
-#         numGintrons = GenomesGintrons_dict[item]["Gintrons"].shape[0]
-#         allGenomes_numGintrons.append(numGintrons)
-#     create_hist(allGenomes_numGintrons, f"Q1: distribution of number of giant_introns in genomes (Gintron threshold: {Gintron_treshold}kb)")
+        numGintrons = GenomesGintrons_dict[item]["Gintrons"].shape[0]
+        allGenomes_numGintrons.append(numGintrons)
+    create_hist(allGenomes_numGintrons, f"Q1: distribution of number of giant_introns in genomes (Gintron threshold: {Gintron_treshold} bp)")
 
 
-#     ### Question 2 = for all Gintrons, what is their length distribution 
+    ### Question 2 = for all Gintrons, what is their length distribution 
     
-#     create_hist(allGenomes_Gintron, f"Q2: giant introns lenght distribution (Gintron threshold: {Gintron_treshold}kb)")
+    create_hist(allGenomes_Gintron, f"Q2: giant introns lenght distribution (Gintron threshold: {Gintron_treshold}bp)")
 
     
     
     
     
-#     ### Question 3 = Is there a corelation between Gintron length and its distance from two ends of the gene
+    ### Question 3 = Is there a corelation between Gintron length and its distance from two ends of the gene
     
-#     Q3_title  = f"Q3: Gintrons lenght vs Distance from both end of a gene (Gintron threshold: {Gintron_treshold}kb)"
-#     Q3_xlabel = "Distance from start"
-#     Q3_ylabel = "Distance from end"
-#     Q3_zlabel = "Gintron Lenght"
+    Q3_title  = f"Q3: Gintrons lenght vs Distance from both end of a gene (Gintron threshold: {Gintron_treshold}bp)"
+    Q3_xlabel = "Distance from start"
+    Q3_ylabel = "Distance from end"
+    Q3_zlabel = "Gintron Lenght"
     
-#     create_scatter(allGenomes_GintronMatrix[:,1], allGenomes_GintronMatrix[:,2], allGenomes_GintronMatrix[:,0], Q3_title, Q3_xlabel, Q3_ylabel, Q3_zlabel)
+    create_scatter(allGenomes_GintronMatrix[:,1], allGenomes_GintronMatrix[:,2], allGenomes_GintronMatrix[:,0], Q3_title, Q3_xlabel, Q3_ylabel, Q3_zlabel)
     
     
     
-#     ### Question 4 = Is there a correlation between genome lenght&number of chromosomes and number of Gintrons, max Gintron, mean GIntron, different quantiles of Gintrons
+    ### Question 4 = Is there a correlation between genome lenght&number of chromosomes and number of Gintrons, max Gintron, mean GIntron, different quantiles of Gintrons
     
-#     quantile = 80
+    quantile = 80
     
-#     allGenomes_numGintrons
-#     allGenomes_GenomeLength = []
-#     allGenomes_numChr = []
-#     max_Gintrons = []
-#     mean_Gintrons = []
-#     quantile_list = []
+    allGenomes_numGintrons
+    allGenomes_GenomeLength = []
+    allGenomes_numChr = []
+    max_Gintrons = []
+    mean_Gintrons = []
+    quantile_list = []
     
-#     for key in GenomesGintrons_dict:
+    for key in GenomesGintrons_dict:
         
-#         GenomeLength = GenomesGintrons_dict [key]["GenomeLength"]
-#         numChr = GenomesGintrons_dict[key]["Num_Chr"]
+        GenomeLength = GenomesGintrons_dict [key]["GenomeLength"]
+        numChr = GenomesGintrons_dict[key]["Num_Chr"]
        
-#         try: 
-#             max_Gintron = GenomesGintrons_dict[key]["Gintrons"].max()
-#             mean_Gintron = GenomesGintrons_dict[key]["Gintrons"].mean()
-#             quantile_Gintron = np.quantile(np.array(GenomesGintrons_dict[key]["Gintrons"]), 0.75)
-#         except:
-#             max_Gintron = 0
-#             mean_Gintron = 0
-#             quantile_Gintron = 0 
+        try: 
+            max_Gintron = GenomesGintrons_dict[key]["Gintrons"].max()
+            mean_Gintron = GenomesGintrons_dict[key]["Gintrons"].mean()
+            quantile_Gintron = np.quantile(np.array(GenomesGintrons_dict[key]["Gintrons"]), 0.75)
+        except:
+            max_Gintron = 0
+            mean_Gintron = 0
+            quantile_Gintron = 0 
             
-#         allGenomes_GenomeLength.append(GenomeLength)
-#         allGenomes_numChr.append(numChr)
-#         max_Gintrons.append(max_Gintron)
-#         mean_Gintrons.append(mean_Gintron)
-#         quantile_list.append(quantile_Gintron)
+        allGenomes_GenomeLength.append(GenomeLength)
+        allGenomes_numChr.append(numChr)
+        max_Gintrons.append(max_Gintron)
+        mean_Gintrons.append(mean_Gintron)
+        quantile_list.append(quantile_Gintron)
     
-#     create_scatter(allGenomes_GenomeLength, allGenomes_numGintrons, allGenomes_numChr, f"Q4.a genome len vs num Gintrons vs num chr (Gintron threshold: {Gintron_treshold}kb)", "genome len", "num Gintrons" , "num chr")
-#     create_scatter(allGenomes_GenomeLength , max_Gintrons, allGenomes_numChr,  f"Q4b.b Genome len vs biggest Gintron vs num chr (Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
-#     create_scatter(allGenomes_GenomeLength , mean_Gintrons, allGenomes_numChr,  f"Q4.c Genome len vs mean Gintron vs num chr wiht (Gintron threshold: {Gintron_treshold}kb)", "genome len", "max Gintron" , "num chr")
-#     create_scatter(allGenomes_GenomeLength , quantile_list, allGenomes_numChr,  f"Q4.d Genome len vs {quantile}-th quantile Gintron vs num chr (Gintron threshold: {Gintron_treshold}kb)", "genome len", f"{quantile}-th quantile Gintron" , "num chr")
+    create_scatter(allGenomes_GenomeLength, allGenomes_numGintrons, allGenomes_numChr, f"Q4.a genome len vs num Gintrons vs num chr (Gintron threshold: {Gintron_treshold}bp)", "genome len", "num Gintrons" , "num chr")
+    create_scatter(allGenomes_GenomeLength , max_Gintrons, allGenomes_numChr,  f"Q4b.b Genome len vs biggest Gintron vs num chr (Gintron threshold: {Gintron_treshold}bp)", "genome len", "max Gintron" , "num chr")
+    create_scatter(allGenomes_GenomeLength , mean_Gintrons, allGenomes_numChr,  f"Q4.c Genome len vs mean Gintron vs num chr wiht (Gintron threshold: {Gintron_treshold}bp)", "genome len", "max Gintron" , "num chr")
+    create_scatter(allGenomes_GenomeLength , quantile_list, allGenomes_numChr,  f"Q4.d Genome len vs {quantile}-th quantile Gintron vs num chr (Gintron threshold: {Gintron_treshold}bp)", "genome len", f"{quantile}-th quantile Gintron" , "num chr")
     
-    # Q5 what does the above questions look like for different filterations when you take kingdoms and their sub catagpries in mind?
-    # I need a filteration function !!! 
+  
