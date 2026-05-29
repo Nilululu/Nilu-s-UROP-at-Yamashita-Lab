@@ -121,7 +121,8 @@ for genome in GenomesGintrons_dict:
     
     # print(size, max_intron, style['color'], style['marker'] )
     ax.scatter(size, max_intron, color = style['color'], marker = style['marker'])
-    
+
+plt.show()  
 print(_mapping)   
     
 
