@@ -44,7 +44,7 @@ csv_file = "all_gtf_downloaded_find.txt"
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
 
-    for line in lines:
+    for line in lines[:200]:
        
         try:
             
