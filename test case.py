@@ -46,35 +46,41 @@ with open(csv_file, mode = 'r') as directory:
 
     for line in lines:
        
-        # name, gtf_loc = line.split(",")
-        gtf_loc = line.strip()    #used on cluster
-        gtf_loc = Path (gtf_loc.strip())
+        try:
+            
+            # name, gtf_loc = line.split(",")
+            gtf_loc = line.strip()    #used on cluster
+            gtf_loc = Path (gtf_loc.strip())
+            
+            genomeId, genes = extract_genesAndId(gtf_loc)
+            compute_intron(genes)
+            
+            Gintron, GintronStart, GintronEnd = get_GintronInfo(genes, genomeId, Gintron_treshold)
+            taxNum = get_taxId(gtf_loc)
+            taxId = taxonomy.find_taxonomy(taxNum, taxonomy_dict, tax_to_name)
+            
+            # print(taxId)
+            genomeMetadata = get_genomeMetadata(gtf_loc)
+    
+            genomeId_to_taxonomy = taxId
+            genomes[genomeId]= genes
+            
+            
+            if Gintron:
+                allGenomes_Gintron.extend(Gintron)
+                allGenomes_GintronStart.extend(GintronStart)
+                allGenomes_GintronEnd.extend(GintronEnd)
+            
+            GenomesGintrons_dict[genomeId] = {}
+            GenomesGintrons_dict[genomeId]["Gintrons"] = np.column_stack((Gintron, GintronStart, GintronEnd))
+            GenomesGintrons_dict[genomeId]["GenomeLength"] = genomeMetadata[0]
+            GenomesGintrons_dict[genomeId]["Num_Chr"] = genomeMetadata[1]
+            GenomesGintrons_dict[genomeId]["taxId"]  = taxId
+        except Exception as e:
+            print("failed to extract the information for genome:", genomeId)
+            print("due to this error:", e)
         
-        genomeId, genes = extract_genesAndId(gtf_loc)
-        compute_intron(genes)
         
-        Gintron, GintronStart, GintronEnd = get_GintronInfo(genes, genomeId, Gintron_treshold)
-        taxNum = get_taxId(gtf_loc)
-        taxId = taxonomy.find_taxonomy(taxNum, taxonomy_dict, tax_to_name)
-        
-        # print(taxId)
-        genomeMetadata = get_genomeMetadata(gtf_loc)
-
-        genomeId_to_taxonomy = taxId
-        genomes[genomeId]= genes
-        
-        
-        if Gintron:
-            allGenomes_Gintron.extend(Gintron)
-            allGenomes_GintronStart.extend(GintronStart)
-            allGenomes_GintronEnd.extend(GintronEnd)
-        
-        GenomesGintrons_dict[genomeId] = {}
-        GenomesGintrons_dict[genomeId]["Gintrons"] = np.column_stack((Gintron, GintronStart, GintronEnd))
-        GenomesGintrons_dict[genomeId]["GenomeLength"] = genomeMetadata[0]
-        GenomesGintrons_dict[genomeId]["Num_Chr"] = genomeMetadata[1]
-        GenomesGintrons_dict[genomeId]["taxId"]  = taxId
-
 allGenomes_GintronMatrix = np.column_stack((allGenomes_Gintron, allGenomes_GintronStart, allGenomes_GintronEnd))
 
 
