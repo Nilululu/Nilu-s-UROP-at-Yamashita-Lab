@@ -69,9 +69,14 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
                     file.write(response.content)
                 print('File downloaded successfully')
             else:
-                print('Failed to download file')
+                print('Failed to download zip file')
+                
+                f_err.write(f"failed to downlaoad zip file, {id_}, {name}\n")
+                #!!!!!!!! we need to capture the ID here and we should continue after the else right?
+                
+                continue
         except:
-            f_err.write(line)
+            f_err.write(f"API failed, {id_}, {name}\n")
             continue
         
         start = time.time()
@@ -81,12 +86,15 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         zip_path = file_path
         extract_dir = file_path.parent / file_path.name.replace(".zip", "")
         
-        #unziiping the downloaded file
+        #unziping the downloaded file
         try:
             with zipfile.ZipFile(zip_path, 'r') as z:
                 z.extractall(extract_dir)
         except zipfile.BadZipFile: 
-            print(f"Error: Bad zipfile; genome id {id_}, {name}")   ##this is not working!
+            
+            f_err.write(f"Bad zipfile, {id_}, {name}\n")
+            
+            #!!!!!!! also store it in an error file 
             file_path.unlink()
             if extract_dir.is_dir():
                 shutil.rmtree(extract_dir)
@@ -102,7 +110,11 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         
         # Handle potential missing GTF (should not accur though)
         if not genome_file:
-            print(f"Error: No genomic.gtf found for {name}, skipping")
+            
+            
+            f_err.write(f"No genomic.gtf found, {id_}, {name}\n")
+            
+            #!!!!!! also should be recorded 
             file_path.unlink()
             shutil.rmtree(extract_dir)
             continue
@@ -120,6 +132,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         if line_n > 20:  # for testing porpuses 
             break
         
+        
+       
 
     csv_file_name = "genomic_directory.csv"
 
@@ -127,4 +141,11 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         writer= csv.writer(file)
         for key in directory_dict:
             writer.writerow([key, directory_dict[key]])  
+    
+    #!!!!!!!! save the id_set 
+    with open("id_set.txt", "w") as f_id:
+        
+        for item in id_set:
+            f_id.write(item)
+            f_id.write("\n")
             

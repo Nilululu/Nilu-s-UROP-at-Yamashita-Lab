@@ -3,7 +3,7 @@ Creates histograms and scatter plots using matplotlib
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
+import random
 
 
 def create_hist( data, title):
@@ -79,6 +79,42 @@ def create_2d_scatter (x, y, title, x_label = None, y_label = None):
     plt.show()
     
 
+
+def get_style (kingdom, _mapping = dict(), _used = set()):
+    
+    colors = ["red", "blue", "green", "purple", "orange", 
+              "cyan", "magenta", "yellow", "brown", "pink"]
+    
+    shapes = ["o","s","^","D", "*", "h", "p", "x"]
+     
+#         "circle": "o", "square": "s", "triangle": "^", "diamond": "D"
+#         "star": "*", "hexagon": "h", "pentagon": "p", "cross": "x"
+
+    #returning existing info
+    if kingdom in _mapping:
+        return _mapping
+    
+    #looping until we get a color and shape that has not been used before
+    while True:
+        color = random.choice(colors)
+        
+        if color in _used:
+            continue
+        shape = random.choice(shapes)
+        
+        if shape in _used:
+            continue
+        
+        _used.add(color)
+        _used.add(shape)
+        
+        break 
+        
+    _mapping[kingdom] = {"color" : color, "marker" : shape}
+    
+    return _mapping
+        
+    
 # def create_filtered_hist (genomes_dict, filter_name, filter_rank, question):
 #     """
 

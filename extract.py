@@ -153,7 +153,7 @@ def compute_intron(genes):
                     intron_end= int(exons[i+1][0])
                     gene["introns"].add((intron_start, intron_end))
  
-    return #genes
+    return genes
     
    
 
@@ -219,5 +219,35 @@ def get_taxId(gtf_file):
             return taxId
 
     
+# def get_biggest_intron(genome):
+#     """
+#     extracts the biggest intron within a genome
 
+#     Parameters
+#     genome : pyton dict
+#     genome_id : string
+    
+#     Returns
+#     -------
+#     max_intron : int
+
+#     """
+    
+#     max_intron = 0
+    
+#     for gene in genome:
+        
+#         for item in genome[gene]["introns"]:
+#             if item != set():  #skipping genes with no introns
+#                 start = item[0]
+#                 end = item [1]
+#                 length = end - start
+                    
+#                 if length > max_intron:
+#                     max_intron = length
+                
+#             else:
+#                 continue
+   
+#     return max_intron
     
