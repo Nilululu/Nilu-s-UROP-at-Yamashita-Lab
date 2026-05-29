@@ -39,12 +39,15 @@ genomeId_to_taxonomy = {}
 #  file containing all gtf locations
 csv_file = "all_gtf_downloaded_find.txt"
 
+#cvs_file = "genomic_directory.csv"    #used on local drive
+
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
 
     for line in lines:
        
-        name, gtf_loc = line.split(",")
+        # name, gtf_loc = line.split(",")
+        gtf_loc = line.strip()    #used on cluster
         gtf_loc = Path (gtf_loc.strip())
         
         genomeId, genes = extract_genesAndId(gtf_loc)
