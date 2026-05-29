@@ -77,7 +77,7 @@ with open(csv_file, mode = 'r') as directory:
             GenomesGintrons_dict[genomeId]["Num_Chr"] = genomeMetadata[1]
             GenomesGintrons_dict[genomeId]["taxId"]  = taxId
         except Exception as e:
-            print("failed to extract the information for genome:", genomeId)
+            print("failed to extract the information for genome:", line)
             print("due to this error:", e)
         
         
