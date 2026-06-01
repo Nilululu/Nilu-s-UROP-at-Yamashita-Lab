@@ -10,27 +10,6 @@ import json
 
 
 
-def get_genomeMetadata (gtf_loc):
-    """
-    parameters: jason_file 
-    returns: genome_lenght, num_chromosome, genome_id
-    """
-    jsonl_file = gtf_loc.parent / "sequence_report.jsonl"
-    
-    with open (jsonl_file, 'r') as report:
-        
-        lines=report.readlines()
-        length = 0
-        num_chromosome = len(lines)
-        
-        for line in lines:
-            json_dict = json.loads(line)
-            length = length + json_dict["length"]
-        
-        genome_lenght = length
-        genome_id = json_dict["assemblyAccession"]   
-        
-    return (genome_lenght, num_chromosome, genome_id)    
 
 
 
@@ -208,17 +187,37 @@ def get_GintronInfo(genome, genome_id, threshold, plot = False):
             print ("No giant introns for {genome_id} with the current threshold of", threshold)
     return (giant_introns, distance_from_start, distance_from_end)
 
-def get_taxId(gtf_file):
+def find_key(key, dictionary):
+    if key in dictionary: return dictionary[key]
+    for keys, values in dictionary.items():
+        if isinstance(values, dict):
+            item = find_key(key, values)
+            if item is not None:
+                return item
 
-    taxonomy_path = gtf_file.parent.parent / "assembly_data_report.jsonl"
+
+
+def get_genomeMetadata (gtf_loc):
+    """
+    parameters: jason_file 
+    returns: genome_lenght, num_chromosome, genome_id
+    """
+    jsonl_file = gtf_loc.parent.parent / "assembly_data_report.jsonl"
     
-    with open(taxonomy_path, 'r') as tax_file:
-        for line in tax_file:
+    with open(jsonl_file, 'r') as report:
+        for line in report:
             A = json.loads(line)
-            taxId = A["assemblyInfo"]["biosample"]["description"]["organism"]["taxId"]
-            return taxId
-
-    
+            
+            taxId = find_key("taxId", A)
+            NumChr = find_key("totalNumberOfChromosomes", A)
+            Type = find_key("assemblyType", A)
+            Status =  find_key("assemblyLevel", A)
+            genome_size = find_key("totalSequenceLength", A)
+            
+    #       
+        
+    return (taxId, genome_size, Status, NumChr, Type)
+  
 # def get_biggest_intron(genome):
 #     """
 #     extracts the biggest intron within a genome

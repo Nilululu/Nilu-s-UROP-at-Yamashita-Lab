@@ -98,12 +98,10 @@ def get_style (kingdom, _mapping = dict(), _used = set()):
     while True:
         color = random.choice(colors)
         shape = random.choice(shapes)
-        if color in _used:
-            if shape in _used:
-                continue
+        if (color, shape) in _used:
+            continue
         
-        _used.add(color)
-        _used.add(shape)
+        _used.add((color, shape))
         
         break 
         
