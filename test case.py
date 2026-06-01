@@ -177,7 +177,7 @@ for genome in GenomesGintrons_dict:
     ax1.scatter(math.log10(size*0.001), math.log10(max_intron*0.001), color = style['color'], marker = style['marker'] )
     ax1.set_title("genome size vs max intron (scale = log bp)")
 
-plt.show()  
+# plt.show()  
 print(_mapping)   
     
 fig2, ax2 = plt.subplots(1)
