@@ -178,10 +178,10 @@ ax2.pie(_kingdom_count.values(), labels = _kingdom_count.keys())
 fig3, ax3 = plt.subplots(1)
 ax3.pie(_type_count.values(), labels = _type_count.keys())
     
-ax.savefig("genome_size_vs_max_intron")
-ax1.savefig("genome_size_vs_max_intron_log")
-ax2.savefig("kingdom_distribution")
-ax3.savefig("type_distribution") 
+fig.savefig("genome_size_vs_max_intron")
+fig1.savefig("genome_size_vs_max_intron_log")
+fig2.savefig("kingdom_distribution")
+fig3.savefig("type_distribution") 
     
     
     
