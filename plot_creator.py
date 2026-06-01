@@ -83,7 +83,7 @@ def create_2d_scatter (x, y, title, x_label = None, y_label = None):
 def get_style (kingdom, _mapping = dict(), _used = set()):
     
     colors = ["red", "blue", "green", "purple", "orange", 
-              "cyan", "magenta", "yellow", "brown", "pink"]
+              "cyan", "magenta", "brown", "pink"]
     
     shapes = ["o","s","^","D", "*", "h", "p", "x"]
      

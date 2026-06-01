@@ -36,9 +36,9 @@ genome_Metadata = {}
 
 #  file containing all gtf locations
 #!!!!! 
-csv_file = "all_gtf_downloaded_find.txt"  
+# csv_file = "all_gtf_downloaded_find.txt"  
 
-# csv_file = "genomic_directory.csv"    #used on local drive
+csv_file = "genomic_directory.csv"    #used on local drive
 
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
@@ -47,8 +47,8 @@ with open(csv_file, mode = 'r') as directory:
        
         try:
             
-            # name, gtf_loc = line.split(",")
-            gtf_loc = line.strip()    #used on cluster  #!!!!!!
+            name, gtf_loc = line.split(",")
+            # gtf_loc = line.strip()    #used on cluster  #!!!!!!
             gtf_loc = Path (gtf_loc.strip())
             
             genomeId, genes = extract_genesAndId(gtf_loc)
@@ -76,6 +76,7 @@ with open(csv_file, mode = 'r') as directory:
             genome_Metadata[genomeId]["Num_Chr"] = int(numChr)
             genome_Metadata[genomeId]["taxId"]  = taxId
             genome_Metadata[genomeId]["genome_type"] = genome_type
+            genome_Metadata[genomeId]["status"] = status
        
         except Exception as e:
             print("failed to extract the information for genome:", line)
@@ -92,6 +93,7 @@ fig1, ax1 = plt.subplots(1)
 _mapping = dict()
 _kingdom_count = dict()
 _type_count = dict()
+_status_count = dict()
 
 for genome in GenomesGintrons_dict:
     # print(genome)
@@ -138,6 +140,7 @@ for genome in GenomesGintrons_dict:
    
     kingdom = genome_Metadata[genome]["taxId"]["kingdom"]
     genome_type = genome_Metadata[genome]["genome_type"]
+    status = genome_Metadata[genome]["status"]
     
     try:
         _mapping = get_style(kingdom)
@@ -158,7 +161,13 @@ for genome in GenomesGintrons_dict:
     
     else:
         _type_count[genome_type] +=1
-        
+    
+    if status not in _status_count:
+        _status_count[status] = 1
+    
+    else:
+        _status_count[status] += 1
+    
     size = genome_Metadata[genome]["size"]
     
     # print(size)
@@ -177,6 +186,11 @@ ax2.pie(_kingdom_count.values(), labels = _kingdom_count.keys())
 
 fig3, ax3 = plt.subplots(1)
 ax3.pie(_type_count.values(), labels = _type_count.keys())
+print(_type_count)
+
+fig4, ax4 = plt.subplots(1)
+ax4.pie(_status_count.values(), labels = _status_count.keys())
+print(_status_count)
     
 fig.savefig("genome_size_vs_max_intron")
 fig1.savefig("genome_size_vs_max_intron_log")
