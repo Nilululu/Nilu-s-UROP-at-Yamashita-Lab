@@ -80,7 +80,7 @@ with open(csv_file, mode = 'r') as directory:
         except Exception as e:
             print("failed to extract the information for genome:", line)
             print("due to this error:", e)
-            raise 
+            # raise 
         
         
 allGenomes_GintronMatrix = np.column_stack((allGenomes_Gintron, allGenomes_GintronStart, allGenomes_GintronEnd))
