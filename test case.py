@@ -35,9 +35,10 @@ genomeId_to_taxonomy = {}
 genome_Metadata = {}
 
 #  file containing all gtf locations
-#!!!!! # csv_file = "all_gtf_downloaded_find.txt"  
+#!!!!! 
+csv_file = "all_gtf_downloaded_find.txt"  
 
-csv_file = "genomic_directory.csv"    #used on local drive
+# csv_file = "genomic_directory.csv"    #used on local drive
 
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
@@ -46,8 +47,8 @@ with open(csv_file, mode = 'r') as directory:
        
         try:
             
-            name, gtf_loc = line.split(",")
-            # gtf_loc = line.strip()    #used on cluster  #!!!!!!
+            # name, gtf_loc = line.split(",")
+            gtf_loc = line.strip()    #used on cluster  #!!!!!!
             gtf_loc = Path (gtf_loc.strip())
             
             genomeId, genes = extract_genesAndId(gtf_loc)
