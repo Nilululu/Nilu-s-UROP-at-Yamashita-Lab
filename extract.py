@@ -6,38 +6,37 @@ Created on Mon Feb 23 15:41:13 2026 by nilu
 """
 from plot_creator import create_hist, create_scatter
 import json
+import re
+import logging
+from datetime import datetime
 
+logger = logging.getLogger(__name__)
+date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+logging.basicConfig(filename="error_parse_log{}.txt".format(date), level=logging.WARNING)
 
-
-
-
-
-
-
-def parse_attr_fields(text):
+reg_attr = r'(\w+)\s+"([^"]*)"'
+def parse_attr_fields(text, reg=reg_attr):
     """ 
-    Parse the last field of a gtf ( the attributes fields) and return a dict key: value.
-
-    use the fact that gtf attribute keys are supposed to be in snake case.
+    Parse the last field of a gtf ( the attributes fields) and return a dict key: value. if key is repeated return key: [value]
 
     :param str text: the attribute fields as a string
     :return: the key value dictionnary
     :rtype: dict[str, str]
     """
     results = {}
-    spt = text.strip().split('";')
-    
-    #the note part of this field would create problems, so I specified spt with 6 max split
-    #gene_id "GUITHDRAFT_162030"; transcript_id "XM_005836996.1"; db_xref "InterPro:IPR007257"; db_xref "JGIDB:Guith1_162030"; gbkey "CDS"; locus_tag "GUITHDRAFT_162030"; note "Subunit of the GINS complex; Psf2; Subunit of the GINS complex.  Psf2"; orig_transcript_id "gnl|WGS:AEIE|GUITHDRAFT_mRNA162030"; product "hypothetical protein"; protein_id "XP_005837053.1"; exon_number "1";
-    
-    for element in spt:
+
+    for (key, value) in reg.findall(text):
         try:
-            if element: # test if the string is not empty, may happen
-                (key, value) = element.split(maxsplit=1)
-                results[key.strip()] = value.replace('"', "").strip() # strip may be useless here not sur
+            this_key = key.strip()
+            if this_key in results:
+                v = results[this_key]
+                if not isinstance(v, list):
+                    results[this_key] = [v]
+                results[this_key].append(value)
+            else:
+                results[this_key] = value.replace('"', "").strip() 
         except:
-            print("error")
-            print(spt)
+            logging.error("failed to parse line {}".format(text))
             raise
     return results
 
@@ -69,11 +68,13 @@ def extract_genesAndId(gtf_file):
     with open(gtf_file, "r") as open_gtf:
 
         for line in open_gtf:
+
             if line.startswith("#"): # comment or info!
-                if line.startswith("#!genome-build-accession"):
-                    
+
+                if line.startswith("#!genome-build-accession"):    
                     # only storing the genome_id from the whole line
                     genome_id = line.strip().split(maxsplit=1)[1] 
+
                 continue
                 
             fields = line.strip().split("\t")
@@ -81,6 +82,7 @@ def extract_genesAndId(gtf_file):
             start = int(fields[3])
             end = int(fields[4])
             info_text = fields[8]   
+
             try:
                 attributes = parse_attr_fields(info_text)
             except:
@@ -96,14 +98,18 @@ def extract_genesAndId(gtf_file):
                 genes[gene_id]["transcripts"]= {}
                 genes[gene_id]["position"]= (start, end)
                 genes[gene_id]["introns"]= set()
-                
+                genes[gene_id]["strand"]= fields[6]
+            
+            if feature == "gene":
+                genes[gene_id]["position"]= (start, end)
         
             if feature == "exon":
                 transcript_id = attributes["transcript_id"]
-                #storing exon positions in its appropraite transcript
+                # storing exon positions in its appropraite transcript
+                #
                 if transcript_id not in genes[gene_id]["transcripts"]:
-                    genes[gene_id]["transcripts"][transcript_id] = []
-                genes[gene_id]["transcripts"][transcript_id].append((start, end))
+                    genes[gene_id]["transcripts"][transcript_id] = {"exon": [], "intron": []}
+                genes[gene_id]["transcripts"][transcript_id]["exon"].append((start, end))
             
    
     return (genome_id, genes)
@@ -118,24 +124,29 @@ def compute_intron(genes):
     returns : genes : a modified dictionary
     
     """
-    for gene in genes.values():
+    for gene_id, gene_dico in genes.items():
         
-        for transcript in gene["transcripts"]:
-            if len(gene["transcripts"][transcript]) <= 1:
+        for transcript_id, transcript_dico in gene_dico["transcripts"].items():
+            exons = transcript_dico["exon"]
+            if len(exons) <= 1:
                 continue #skipping genes with a single exon
             
             else:
-                exons = sorted(gene["transcripts"][transcript], key=lambda x: x[0])
+                exons = sorted(exons, key=lambda x: x[0])
 
                 for i in range(len(exons)-1):
-                    intron_start= int(exons[i][1])
+                    intron_start= int(exons[i][1]) - 1 # gtf are 1 bsed to get to 0 based you need to minus 1 here
                     intron_end= int(exons[i+1][0])
-                    gene["introns"].add((intron_start, intron_end))
+                    transcript_dico["introns"].add((intron_start, intron_end))
+
+                    # depending we may have to modify that like use a set to get unique combination
+                    gene_dico["introns"].add((intron_start, intron_end))
+
  
     return genes
     
    
-
+# plot should be elsewhere
 def get_GintronInfo(genome, genome_id, threshold, plot = False):
     """
     extracts giants introns and their relative positions with respect
@@ -196,7 +207,7 @@ def find_key(key, dictionary):
                 return item
 
 
-
+# this should be elsewehre
 def get_genomeMetadata (gtf_loc):
     """
     parameters: jason_file 
@@ -218,35 +229,29 @@ def get_genomeMetadata (gtf_loc):
         
     return (taxId, genome_size, Status, NumChr, Type)
   
-# def get_biggest_intron(genome):
-#     """
-#     extracts the biggest intron within a genome
+def get_biggest_intron(genome):
+    """
+    extracts the biggest intron within a genome
+    Parameters
+    genome : pyton dict
+    genome_id : string
 
-#     Parameters
-#     genome : pyton dict
-#     genome_id : string
-    
-#     Returns
-#     -------
-#     max_intron : int
+    Returns
+    -------
+    max_intron : int
+    """
+    # here you loose all informations
+    # you don't know which gene has the largest intron.
 
-#     """
-    
-#     max_intron = 0
-    
-#     for gene in genome:
-        
-#         for item in genome[gene]["introns"]:
-#             if item != set():  #skipping genes with no introns
-#                 start = item[0]
-#                 end = item [1]
-#                 length = end - start
+    max_intron = 0
+
+    for gene_id, gene_info in genome.items():
+        if intron := (gene_info.get("intron")):
+            for (start, end) in intron:
+                length = end - start
                     
-#                 if length > max_intron:
-#                     max_intron = length
-                
-#             else:
-#                 continue
-   
-#     return max_intron
+                if length > max_intron:
+                    max_intron = length
+
+    return max_intron
     

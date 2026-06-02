@@ -139,22 +139,20 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         line_n += 1
         
         # if line_n > 20:  # for testing purpuses 
-        #     break
-        
-        
+        #     break        
        
 
-    csv_file_name = "genomic_directory.csv"
+csv_file_name = "genomic_directory.csv"
 
-    with open(csv_file_name, mode = 'w', newline= '') as file:
-        writer = csv.writer(file)
-        for key in directory_dict:
-            writer.writerow([key, directory_dict[key]])  
+with open(csv_file_name, mode = 'w', newline= '') as file:
+    writer = csv.writer(file)
+    for key in directory_dict:
+        writer.writerow([key, directory_dict[key]])  
+
+#!!!!!!!! save the id_set 
+with open("id_set.txt", "w") as f_id:
     
-    #!!!!!!!! save the id_set 
-    with open("id_set.txt", "w") as f_id:
+    for item in id_set:
+        f_id.write(item)
+        f_id.write("\n")
         
-        for item in id_set:
-            f_id.write(item)
-            f_id.write("\n")
-            
