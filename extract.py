@@ -79,7 +79,7 @@ def extract_genesAndId(gtf_file):
                 
             fields = line.strip().split("\t")
             feature = fields[2]
-            start = int(fields[3])
+            start = int(fields[3]) - 1 # gtf are 1 bsed to get to 0 based you need to minus 1 here
             end = int(fields[4])
             info_text = fields[8]   
 
@@ -135,7 +135,7 @@ def compute_intron(genes):
                 exons = sorted(exons, key=lambda x: x[0])
 
                 for i in range(len(exons)-1):
-                    intron_start= int(exons[i][1]) - 1 # gtf are 1 bsed to get to 0 based you need to minus 1 here
+                    intron_start= int(exons[i][1]) 
                     intron_end= int(exons[i+1][0])
                     transcript_dico["introns"].add((intron_start, intron_end))
 
