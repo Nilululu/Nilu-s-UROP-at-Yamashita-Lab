@@ -9,11 +9,18 @@ import pathlib
 import csv
 import zipfile
 import shutil 
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename="error_download_log.txt", level=logging.WARNING)
 
 step_2 = 1000  # is supposed to be 800
 step = 100   #is supposed to be 10
-directory_dict = dict() #to store genome names and genomic.gtf locatiosn
-p = pathlib.Path.cwd() #defining the current folder
+
+assert step_2 % step == 0
+
+directory_dict = {} #to store genome names and genomic.gtf locatiosn
+base_wkdir = pathlib.Path.cwd() 
 start = time.time()
 id_set = set()
 
@@ -22,21 +29,42 @@ id_set = set()
 base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/download?include_annotation_type=GENOME_GTF&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED"
 
 #base directory for storing
-base_dir = pathlib.Path(p/ "ncbi_data_directory")
+base_dir = pathlib.Path(base_wkdir/ "ncbi_data_directory")
 base_dir.mkdir(exist_ok = True)   #creating the directory if not already created
+
+
+def download(base_url, id_, folder):
+    this_url = base_url.format(id_)
+    response = requests.get(this_url)
+    file_path = main_folder_path /  '{}_genome.zip'.format(name)
+
+    if response.status_code == 200:    # download the file in the main_folder
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        logger.info('File downloaded successfully')
+    else:
+        logger.error(f"Failed to download zip file {id_}, {name}\n")
+        raise AssertionError
+    return file_path
+
+
 
 line_n = 0
 
-with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt", "w") as f_err:
-    
-    lines = refseq_eukaryots.readlines()
 
-    for line in lines[1:]:
-        
-        field= line.split("\t")
-        id_= field[1]  # ge the id from the line
+
+with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
+    
+    refseq_eukaryots.readline()
+    for line in refseq_eukaryots:
+        line = line.strip()
+        if not line:
+            continue
+
+        field = line.split("\t")
+        id_ = field[1]  # get the id from the line
         if id_ in id_set:
-            print("duplicated_id:", id_)   #adressing potentil repeats 
+            logger.WARN("duplicated_id:", id_)   #adressing potentil repeats 
             continue
         if id_.startswith("GCA"):    #skipping non-refseq annotated gtfs
             continue
@@ -47,9 +75,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
             time.sleep(0.1)
             
         main_folder = line_n // step
-        sub_folder = line_n % step
         top = line_n // step_2
-        line_n += 1
+
         # makdir a folder with top_folder
         top_folder_path =  base_dir / 'top_{}'.format(str(top))
         top_folder_path.mkdir(exist_ok=True)
@@ -58,30 +85,17 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
         main_folder_path = top_folder_path / 'main_{}'.format(str(main_folder))
         main_folder_path.mkdir(exist_ok=True)
         
-    
         try:
-            this_url = base_url.format(id_)
-            response = requests.get(this_url)
-            file_path = main_folder_path /  '{}_genome.zip'.format(name)
-        
-            if response.status_code == 200:    # download the file in the main_folder
-                with open(file_path, 'wb') as file:
-                    file.write(response.content)
-                print('File downloaded successfully')
-            else:
-                print('Failed to download zip file')
-                
-                f_err.write(f"failed to downlaoad zip file, {id_}, {name}\n")
-                #!!!!!!!! we need to capture the ID here and we should continue after the else right?
-                
-                continue
+            file_path = download(base_url=base_url, id_=id_, folder=main_folder_path)
         except:
-            f_err.write(f"API failed, {id_}, {name}\n")
+            logger.error(f"Failed to download zip file {id_}, {name}\n")
+            id_set.remove(id_)
             continue
-        
+    
+        # time after download used to  ward against API limit
         start = time.time()
         
-        print(top, main_folder, sub_folder)
+        logger.info(top, main_folder)
         
         zip_path = file_path
         extract_dir = file_path.parent / file_path.name.replace(".zip", "")
@@ -91,45 +105,40 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
             with zipfile.ZipFile(zip_path, 'r') as z:
                 z.extractall(extract_dir)
         except zipfile.BadZipFile: 
+            logger.error(f"Bad zipfile, {id_}, {name}\n")
             
-            f_err.write(f"Bad zipfile, {id_}, {name}\n")
-            
-            #!!!!!!! also store it in an error file 
             file_path.unlink()
             if extract_dir.is_dir():
                 shutil.rmtree(extract_dir)
-                
+            id_set.remove(id_)
             continue 
         
         except:
             raise
+
+        file_path.unlink()
         
         # Search inside extracted folder for genomic.gtf
         genome_file = list(extract_dir.rglob("genomic.gtf"))
-        
+
         
         # Handle potential missing GTF (should not accur though)
         if not genome_file:
             
-            
-            f_err.write(f"No genomic.gtf found, {id_}, {name}\n")
-            
+            logger.error(f"No genomic.gtf found, {id_}, {name}\n")
             #!!!!!! also should be recorded 
-            file_path.unlink()
             shutil.rmtree(extract_dir)
+            id_set.remove(id_)
             continue
             
-        else:
-            #save the location of the genomic file 
-            print("Found GTF:", genome_file[0])
-            dict_key = name + "_genome"
-            dict_val = genome_file[0]
-            directory_dict[dict_key]= dict_val
+
+        logger.info("Found GTF:", genome_file[0])
+        dict_key = name + "_genome"
+        dict_val = genome_file[0]
+        directory_dict[dict_key]= dict_val
+        line_n += 1
         
-        file_path.unlink()
-        #deleting the zip folder !!!!!!!
-        
-        # if line_n > 20:  # for testing porpuses 
+        # if line_n > 20:  # for testing purpuses 
         #     break
         
         
@@ -138,7 +147,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots, open("error.txt
     csv_file_name = "genomic_directory.csv"
 
     with open(csv_file_name, mode = 'w', newline= '') as file:
-        writer= csv.writer(file)
+        writer = csv.writer(file)
         for key in directory_dict:
             writer.writerow([key, directory_dict[key]])  
     
