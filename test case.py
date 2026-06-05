@@ -6,7 +6,8 @@ tests the modulaes "extract" and "plot_creator"
 uses Guilt genome: the smallest genome among eaukaryotes 
 """
 
-from extract import extract_genesAndId, compute_intron, get_GintronInfo, get_genomeMetadata
+from extract import extract_genesAndId, compute_intron 
+from metadata import get_GintronInfo, get_genomeMetadata
 from pathlib import Path
 from plot_creator import create_hist, create_scatter, create_2d_scatter, get_style
 import numpy as np
