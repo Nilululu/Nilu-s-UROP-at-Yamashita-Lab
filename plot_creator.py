@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import random
 
 
-def create_hist( data, title):
+def create_hist( data, title, save = False):
     """
     Parameters
     data : python list
@@ -25,10 +25,14 @@ def create_hist( data, title):
     ax.set_title(title)
     
     plt.tight_layout()
-    plt.show()
+    if not save:
+        plt.show()
+    
+    else:
+        plt.savefig(title)
     
     return
-def create_scatter (x, y, z, title, x_label, y_label, z_label):
+def create_scatter (x, y, z, title, x_label, y_label, z_label, save = False):
     
     """
     Parameters
@@ -53,11 +57,16 @@ def create_scatter (x, y, z, title, x_label, y_label, z_label):
     plt.title(title)
    
     plt.tight_layout()
-    plt.show()
+    
+    if not save:
+        plt.show()
+    
+    else:
+        plt.savefig(title)
         
     return 
 
-def create_2d_scatter (x, y, title, x_label = None, y_label = None):
+def create_2d_scatter (x, y, title, x_label = None, y_label = None, save = False):
     """
     Parameters
     x, y: python lists or numoy arrays
@@ -76,14 +85,20 @@ def create_2d_scatter (x, y, title, x_label = None, y_label = None):
         ax.set_ylabel(y_label)
     
     plt.tight_layout()
-    plt.show()
     
+    if not save:
+        plt.show()
+    
+    else:
+        plt.savefig(title)
+    
+    return    
 
 
 def get_style (kingdom, _mapping = dict(), _used = set()):
     
-    colors = ["red", "blue", "green", "purple", "orange", 
-              "cyan", "magenta", "brown", "pink"]
+    colors = ['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e',
+     '#e6ab02','#a6761d','#666666']
     
     shapes = ["o","s","^","D", "*", "h", "p", "x"]
      
@@ -110,30 +125,6 @@ def get_style (kingdom, _mapping = dict(), _used = set()):
     return _mapping
         
     
-# def create_filtered_hist (genomes_dict, filter_name, filter_rank, question):
-#     """
 
-#     Parameters
-#     ----------
-#     genomes_dict : python dict
-#         gene dic for genomes and gintrons dict of all genomes.
-#     filter_name : str
-#         animals, insects, etc.
-#     filter_rank : str
-#         kingdom, subkingdom, family, etc.
-#     question: str
-#         gintrons, max, mean, num_gintrons, percentile. 
-
-#     Returns
-#     -------
-#     None.
-    
-
-#     """
-    
-#     for keys in genomes_dict:
-#         if genomes_dict [keys]["taxId"][filter_rank] == filter_name:
-            
-#     #filteration 
     
     

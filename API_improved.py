@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """
+
+The script uses an API to dowloand all ref-seq annotated genomes (excluding their FASTA files) from NCBI, 
+The script keeps track of succssfully downloaded gtf files and stores their location in genomic_directory 
+
 Created on Thu Apr  2 15:39:01 2026 by nilu
 """
 
@@ -34,9 +38,26 @@ base_dir.mkdir(exist_ok = True)   #creating the directory if not already created
 
 
 def download(base_url, id_, folder):
+    
+    """
+    incorporates genome id into the Application Programming Interfase (API) url 
+    and send a request to ncbi to download the zip folder in the given location
+
+    Parameters
+    base_url : str : NCBI API containing a request for different genome files that we need
+    id_ : str : genome accession id 
+    folder : path : path to the storage location 
+
+    Returns
+    -------
+    file_path : path to the stored zip file
+
+    
+    """
+    
     this_url = base_url.format(id_)
     response = requests.get(this_url)
-    file_path = main_folder_path /  '{}_genome.zip'.format(name)
+    file_path = folder /  '{}_genome.zip'.format(name)
 
     if response.status_code == 200:    # download the file in the main_folder
         with open(file_path, 'wb') as file:
@@ -138,8 +159,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         directory_dict[dict_key]= dict_val
         line_n += 1
         
-        # if line_n > 20:  # for testing purpuses 
-        #     break        
+        #if line_n > 30:  # for testing purpuses 
+         #   break        
        
 
 csv_file_name = "genomic_directory.csv"
