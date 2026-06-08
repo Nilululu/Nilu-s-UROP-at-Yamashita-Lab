@@ -64,8 +64,10 @@ with open(csv_file, mode = 'r') as directory:
             
             taxNum, genome_size, status, numChr, genome_type= get_genomeMetadata(gtf_loc)
             
+            
             taxId = taxonomy.find_taxonomy(taxNum, taxonomy_dict, tax_to_name)
             
+            taxId_copy = taxId.copy()
             genomes[genomeId]= genes
             
             
@@ -80,7 +82,9 @@ with open(csv_file, mode = 'r') as directory:
             genome_Metadata[genomeId] = {}
             genome_Metadata[genomeId]["size"] = int(genome_size)
             genome_Metadata[genomeId]["Num_Chr"] = int(numChr)
-            genome_Metadata[genomeId]["taxId"]  = taxId
+            genome_Metadata[genomeId]["taxId"]  = taxId_copy
+            
+            # print(genome_Metadata[genomeId]["taxId"])
             genome_Metadata[genomeId]["genome_type"] = genome_type
             genome_Metadata[genomeId]["status"] = status
        
@@ -88,7 +92,6 @@ with open(csv_file, mode = 'r') as directory:
         except Exception as e:
             
             logger.error("failed to extract the information for genome: {} due to this error {}".format(line, e))
-            raise 
         
         
 allGenomes_GintronMatrix = np.column_stack((allGenomes_Gintron, allGenomes_GintronStart, allGenomes_GintronEnd))
@@ -102,11 +105,16 @@ _kingdom_count = dict()
 _type_count = dict()
 _status_count = dict()
 
+
+# print(genome_Metadata)
 for genomeId, meta_dico in genome_Metadata.items():
-    print(meta_dico)
+    #print(meta_dico)
     size = meta_dico["size"]
     
     kingdom = meta_dico["taxId"]["kingdom"]
+    
+    # print(meta_dico["taxId"])
+    # print(meta_dico["taxId"]["kingdom"])
     genome_type = meta_dico["genome_type"]
     status = meta_dico["status"]
     
@@ -145,7 +153,7 @@ for genomeId, meta_dico in genome_Metadata.items():
 
         
         
-   
+    print(max_intron)
     
     
     logger.info("kingdom {} and genome type {}".format(kingdom, genome_type))
