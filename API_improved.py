@@ -33,7 +33,7 @@ id_set = set()
 base_url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{}/download?include_annotation_type=GENOME_GTF&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED"
 
 #base directory for storing
-base_dir = pathlib.Path(base_wkdir/ "ncbi_data_directory")
+base_dir = pathlib.Path(base_wkdir/ "ncbi_data_directory_0.1")
 base_dir.mkdir(exist_ok = True)   #creating the directory if not already created
 
 
@@ -154,8 +154,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             
 
         logger.info("Found GTF:", genome_file[0])
-        dict_key = name + "_genome"
-        dict_val = genome_file[0]
+        dict_key = genome_file[0]
+        dict_val = name + "_genome"
         directory_dict[dict_key]= dict_val
         line_n += 1
         

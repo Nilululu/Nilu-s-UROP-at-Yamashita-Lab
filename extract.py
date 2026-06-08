@@ -7,10 +7,11 @@ Created on Mon Feb 23 15:41:13 2026 by nilu
 """
 import logging
 from datetime import datetime
+import re
 
-logger = logging.getLogger(__name__)
-date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
-logging.basicConfig(filename="error_parse_log{}.txt".format(date), level=logging.WARNING)
+#logger = logging.getLogger(__name__)
+#date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+#logging.basicConfig(filename="error_parse_log{}.txt".format(date), level=logging.INFO)
 
 reg_attr = r'(\w+)\s+"([^"]*)"'
 def parse_attr_fields(text, reg=reg_attr):
@@ -23,7 +24,7 @@ def parse_attr_fields(text, reg=reg_attr):
     """
     results = {}
 
-    for (key, value) in reg.findall(text):
+    for (key, value) in re.findall(reg, text):
         try:
             this_key = key.strip()
             if this_key in results:
@@ -34,7 +35,8 @@ def parse_attr_fields(text, reg=reg_attr):
             else:
                 results[this_key] = value.replace('"', "").strip() 
         except:
-            logging.error("failed to parse line {}".format(text))
+            print("failed to parse line {}".format(text))
+            #logging.error("failed to parse line {}".format(text))
             raise
     return results
 
@@ -105,8 +107,8 @@ def extract_genesAndId(gtf_file):
                 # storing exon positions in its appropraite transcript
 
                 if transcript_id not in genes[gene_id]["transcripts"]:
-                    genes[gene_id]["transcripts"][transcript_id] = {"exon": [], "intron": []}
-                genes[gene_id]["transcripts"][transcript_id]["exon"].append((start, end))
+                    genes[gene_id]["transcripts"][transcript_id] = {"exons": [], "introns": []}
+                genes[gene_id]["transcripts"][transcript_id]["exons"].append((start, end))
             
    
     return (genome_id, genes)
@@ -124,7 +126,7 @@ def compute_intron(genes):
     for gene_id, gene_dico in genes.items():
         
         for transcript_id, transcript_dico in gene_dico["transcripts"].items():
-            exons = transcript_dico["exon"]
+            exons = transcript_dico["exons"]
             if len(exons) <= 1:
                 continue #skipping genes with a single exon
             
@@ -134,7 +136,7 @@ def compute_intron(genes):
                 for i in range(len(exons)-1):
                     intron_start= int(exons[i][1]) 
                     intron_end= int(exons[i+1][0])
-                    transcript_dico["introns"].add((intron_start, intron_end))
+                    transcript_dico["introns"].append((intron_start, intron_end))
 
                     # depending we may have to modify that like use a set to get unique combination
                     gene_dico["introns"].add((intron_start, intron_end))

@@ -6,6 +6,14 @@ tests the modulaes "extract" and "plot_creator"
 uses Guilt genome: the smallest genome among eaukaryotes 
 """
 
+import logging
+
+
+
+logging.basicConfig(filename="info_test_logger.txt", level=logging.DEBUG, force=True) #format="%(asctime)s%(message)s" )
+logger = logging.getLogger(__name__)
+logger.info("the loggin initialized successfully")
+
 from extract import extract_genesAndId, compute_intron 
 from metadata import get_GintronInfo, get_genomeMetadata
 from pathlib import Path
@@ -14,10 +22,9 @@ import numpy as np
 import taxonomy 
 import matplotlib.pyplot as plt
 import math
-#### incorporate the taxonomy module 
 
 
-#for using the script in cluster
+
 nodes_file = "nodes.dmp"
 names_file = "names.dmp"
 
@@ -35,8 +42,6 @@ GenomesGintrons_dict = {}
 genomeId_to_taxonomy = {}
 genome_Metadata = {}
 
-#  file containing all gtf locations
-#!!!!! 
 # csv_file = "all_gtf_downloaded_find.txt"  
 
 csv_file = "genomic_directory.csv"    #used on local drive
@@ -44,7 +49,7 @@ csv_file = "genomic_directory.csv"    #used on local drive
 with open(csv_file, mode = 'r') as directory:
     lines = directory.readlines()
 
-    for line in lines[:200]:
+    for line in lines:
        
         try:
             
@@ -57,8 +62,8 @@ with open(csv_file, mode = 'r') as directory:
             
             Gintron, GintronStart, GintronEnd = get_GintronInfo(genes, genomeId, Gintron_treshold)
             
-            # print(taxId)
             taxNum, genome_size, status, numChr, genome_type= get_genomeMetadata(gtf_loc)
+            
             taxId = taxonomy.find_taxonomy(taxNum, taxonomy_dict, tax_to_name)
             
             genomes[genomeId]= genes
@@ -79,10 +84,11 @@ with open(csv_file, mode = 'r') as directory:
             genome_Metadata[genomeId]["genome_type"] = genome_type
             genome_Metadata[genomeId]["status"] = status
        
+            logger.info("information extracted successfully for genome {}".format(genomeId))
         except Exception as e:
-            print("failed to extract the information for genome:", line)
-            print("due to this error:", e)
-            # raise 
+            
+            logger.error("failed to extract the information for genome: {} due to this error {}".format(line, e))
+            raise 
         
         
 allGenomes_GintronMatrix = np.column_stack((allGenomes_Gintron, allGenomes_GintronStart, allGenomes_GintronEnd))
@@ -96,58 +102,58 @@ _kingdom_count = dict()
 _type_count = dict()
 _status_count = dict()
 
-for genome in GenomesGintrons_dict:
-    # print(genome)
-    size = genome_Metadata[genome]["size"]
+for genomeId, meta_dico in genome_Metadata.items():
+    print(meta_dico)
+    size = meta_dico["size"]
+    
+    kingdom = meta_dico["taxId"]["kingdom"]
+    genome_type = meta_dico["genome_type"]
+    status = meta_dico["status"]
+    
+    logger.info("genome {}, with size{}".format(genomeId, size))
     
     max_intron = 0
     
     # print ("size", GenomesGintrons_dict[genome]["Gintrons"].size)
     
     
-    if GenomesGintrons_dict[genome]["Gintrons"].size > 0:
-        Gintron_f = GenomesGintrons_dict[genome]["Gintrons"]
+    if GenomesGintrons_dict[genomeId]["Gintrons"].size > 0:
+        Gintron_f = GenomesGintrons_dict[genomeId]["Gintrons"]
         max_intron = Gintron_f[:,0].max()
     
     else:
         
         try: 
-            for gene in genomes[genome]:
-                # print(genomes[genome][gene])
-                for item in genomes[genome][gene]['introns']:
-                    # print("item", item)
+            for gene in genomes[genomeId]:
+                for item in genomes[genomeId][gene]['introns']:
                     if item != set():  #skipping genes with no introns
                         start = item[0]
                         end = item [1]
                         length = end - start
-                        
-                        # print("length", length)
-                            
+                                                    
                         if length > max_intron:
                             max_intron = length
                         
                     else:
                         continue
-            # print("success", genome)
         
         except Exception as e:
             print(item)
-            print("failed attempt to extract introns", genome, e)
-            print(genomes[genome][gene].keys())
+            print("failed attempt to extract introns", genomeId, e)
+            print(genomes[genomeId][gene].keys())
             # raise
 
         
         
    
-    kingdom = genome_Metadata[genome]["taxId"]["kingdom"]
-    genome_type = genome_Metadata[genome]["genome_type"]
-    status = genome_Metadata[genome]["status"]
     
+    
+    logger.info("kingdom {} and genome type {}".format(kingdom, genome_type))
     try:
         _mapping = get_style(kingdom)
     
     except Exception as e:
-        print("failed to get style for:", kingdom, genome, e)
+        print("failed to get style for:", kingdom, genomeId, e)
         print(_mapping)
         
     style = _mapping[kingdom]
@@ -169,10 +175,7 @@ for genome in GenomesGintrons_dict:
     else:
         _status_count[status] += 1
     
-    size = genome_Metadata[genome]["size"]
     
-    # print(size)
-    # print(size, max_intron, style['color'], style['marker'] )
     ax.scatter((size*0.001), (max_intron*0.001), color = style['color'], marker = style['marker'])
     ax.set_title(f"genome size vs max intron (scale = kbp), labels: {_mapping}")
     ax1.scatter(math.log10(size*0.001), math.log10(max_intron*0.001), color = style['color'], marker = style['marker'] )
