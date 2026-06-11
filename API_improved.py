@@ -143,7 +143,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         genome_file = list(extract_dir.rglob("genomic.gtf"))
 
         
-        # Handle potential missing GTF (should not accur though)
+        # Handle potential missing GTF 
         if not genome_file:
             
             logger.error(f"No genomic.gtf found, {id_}, {name}\n")

@@ -72,19 +72,26 @@ def find_taxonomy(tax_id, taxonomy_dict, tax_to_name, famline_dict = {}):
 
     """
     
-    try: 
+    try:    
         parent_id, rank = taxonomy_dict[tax_id]
         name = tax_to_name [tax_id]
         famline_dict[rank] = name
         
+            
     except:
         print("Error: tax_id not found in the dictionary")
         return 
     
+   
+
+    if parent_id == 1:
+        famline_dict["kingdom"] = "NA"
+        return famline_dict
     if rank == "kingdom":
         return famline_dict
-    
+        
     else :
+
         return find_taxonomy(parent_id, taxonomy_dict, tax_to_name, famline_dict)
         
 
