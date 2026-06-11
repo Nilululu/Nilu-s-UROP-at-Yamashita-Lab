@@ -113,7 +113,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         
         if params_response.status_code != 200:
             
-            logger.error(f"prevented downloading a suppressed GTF with name_id {name}")
+            logger.warning(f"prevented downloading a suppressed GTF with name_id {name}")
             id_set.remove(id_)
             continue 
             
@@ -171,8 +171,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         directory_dict[dict_key]= dict_val
         line_n += 1
         
-        if line_n > 30:  # for testing purpuses 
-           break        
+        # if line_n > 30:  # for testing purpuses 
+        #    break        
        
 
 csv_file_name = "genomic_directory.csv"
