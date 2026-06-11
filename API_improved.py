@@ -57,8 +57,10 @@ def download(base_url, id_, folder):
     
     this_url = base_url.format(id_)
     response = requests.get(this_url)
-    file_path = folder /  '{}_genome.zip'.format(name)
-
+    file_path = folder /  '{}.zip'.format(name)
+    
+    
+        
     if response.status_code == 200:    # download the file in the main_folder
         with open(file_path, 'wb') as file:
             file.write(response.content)
@@ -67,7 +69,7 @@ def download(base_url, id_, folder):
         logger.error(f"Failed to download zip file {id_}, {name}\n")
         raise AssertionError
     return file_path
-
+    
 
 
 line_n = 0
@@ -91,7 +93,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             continue
 
         id_set.add(id_)
-        name = field[3].replace(" ", "_")
+        name = field[3].replace(" ", "_") + "_" + id_
         while time.time() - start < 0.3:
             time.sleep(0.1)
             
@@ -105,6 +107,16 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         # makdir a folder with main_fodler
         main_folder_path = top_folder_path / 'main_{}'.format(str(main_folder))
         main_folder_path.mkdir(exist_ok=True)
+        
+        params = {"filters.assembly_version": "current"} # only latest, non-suppressed } 
+        params_response = requests.get( f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{id_}/dataset_report", params=params )
+        
+        if params_response.status_code != 200:
+            
+            logger.error(f"prevented downloading a suppressed GTF with name_id {name}")
+            id_set.remove(id_)
+            continue 
+            
         
         try:
             file_path = download(base_url=base_url, id_=id_, folder=main_folder_path)
@@ -155,12 +167,12 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
 
         logger.info("Found GTF:", genome_file[0])
         dict_key = genome_file[0]
-        dict_val = name + "_genome"
+        dict_val = name 
         directory_dict[dict_key]= dict_val
         line_n += 1
         
-        #if line_n > 30:  # for testing purpuses 
-         #   break        
+        if line_n > 30:  # for testing purpuses 
+           break        
        
 
 csv_file_name = "genomic_directory.csv"
