@@ -100,7 +100,7 @@ def get_style (kingdom, _mapping = dict(), _used = set()):
     colors = ['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e',
      '#e6ab02','#a6761d','#666666']
     
-    shapes = ["o","s","^","D", "*", "h", "p", "x"]
+    #shapes = ["o","s","^","D", "*", "h", "p", "x"]
      
 #         "circle": "o", "square": "s", "triangle": "^", "diamond": "D"
 #         "star": "*", "hexagon": "h", "pentagon": "p", "cross": "x"
@@ -112,15 +112,15 @@ def get_style (kingdom, _mapping = dict(), _used = set()):
     #looping until we get a color and shape that has not been used before
     while True:
         color = random.choice(colors)
-        shape = random.choice(shapes)
-        if (color, shape) in _used:
+        #shape = random.choice(shapes)
+        if color in _used:
             continue
         
-        _used.add((color, shape))
+        _used.add(color)
         
         break 
         
-    _mapping[kingdom] = {"color" : color, "marker" : shape}
+    _mapping[kingdom] = {"color" : color}
     
     return _mapping
         

@@ -4,7 +4,7 @@ Created on Sun May 24 13:20:02 2026
 
 @author: nilof
 """
-
+import requests  
 
 def find_unique_GCF_from_path (filePath):
     """ a function that finds the unique words that starts with GCF_* in a text file and return them in a list/set"""
@@ -58,7 +58,7 @@ def find_all_GCF (filePath):
     print("dashless set", len(set(dashless_list)))
     print("set", len(set(gcf_list)))
     
-    return gcf_list, set(dashless_list)
+    return gcf_list
     
     
     
@@ -82,16 +82,17 @@ def return_difference (setA, setB, setAname, setBname):
 
 # # id_set = find_unique_GCF_column("id_set.txt", 0)    #should be replaced with id_set from cluster if obtained later
 tsv = find_unique_GCF_column("ncbi_refseq-eukaryot.tsv", 1)
-reports = find_unique_GCF_from_path("all_report_downloaded.txt")
+#reports = find_unique_GCF_from_path("all_report_downloaded.txt")
 genomic_directory = find_unique_GCF_from_path("genomic_directory.csv")
 all_gtf_downloaded = find_unique_GCF_from_path("all_gtf_downloaded.txt")
 id_set = find_unique_GCF_column("id_set.txt", 0)
+error = find_all_GCF("error_download_log.txt")
 
 print("tsv 2nd columns unique GCF", len (tsv))
 print("genomic directory number", len(genomic_directory))
 print("all_gtf_downloaded", len(all_gtf_downloaded))
 print("id_set", len(id_set))
-print("reports_downloaded", len(reports))
+#print("reports_downloaded", len(reports))
 
 print("\n"*2)
 
@@ -101,9 +102,22 @@ return_difference(genomic_directory, all_gtf_downloaded, "genomic_directory", "a
 
 return_difference(id_set, genomic_directory, "id_set", "genomic_directory")
 
-return_difference(id_set, reports, "ide_set", "reports")
+#return_difference(id_set, reports, "ide_set", "reports")
 
-return_difference(reports, all_gtf_downloaded, "reports", "all_gtf")
+#return_difference(reports, all_gtf_downloaded, "reports", "all_gtf")
+
+print(error)
+
+#### I want to check if all the genomes in error file are suppressed
+
+#for id_ in error:
+    #params = {"filters.assembly_version": "current"} # only latest, non-suppressed } 
+    #params_response = requests.get( f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{id_}/dataset_report", params=params )
+    
+    #print(params_response.status_code)
+       
+    
+            
 
 
     
