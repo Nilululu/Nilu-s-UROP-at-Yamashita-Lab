@@ -70,7 +70,14 @@ fig3, ax3 = plt.subplots(1)
 ax3.pie(type_count.values(), labels = type_count.keys())
 
 fig4, ax4 = plt.subplots(1)
-ax4.pie(status_count.values(), labels = status_count.keys())
+ax4.pie(status_count.values())
+
+# Place the legend outside the chart (top-right corner area)
+ax4.legend(labels= status_count.keys(), bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# Prevent the outside legend from getting cut off in the saved/rendered image
+fig4.tight_layout()
+
 
 logger.info(kingdom_count)
 logger.info(kingdom_mapping)
