@@ -67,7 +67,11 @@ fig2, ax2 = plt.subplots(1)
 ax2.pie(kingdom_count.values(), labels = kingdom_count.keys())
 
 fig3, ax3 = plt.subplots(1)
-ax3.pie(type_count.values(), labels = type_count.keys())
+ax3.pie(type_count.values())
+
+# Place the legend outside the chart (top-right corner area)
+ax3.legend(labels = type_count.keys(), bbox_to_anchor=(1.05, 1), loc='upper left')
+fig3.tight_layout()
 
 fig4, ax4 = plt.subplots(1)
 ax4.pie(status_count.values())
