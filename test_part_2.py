@@ -11,8 +11,8 @@ from plot_creator import get_style
 from math import log10
 import logging
 
-logging.basicConfig("info_test2_logger.txt", level=logging.WARNING)
-logger = logging.get_logger(__name__)
+logging.basicConfig(filename="info_test2_logger.txt", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 fig, ax = plt.subplots(1)
@@ -55,10 +55,10 @@ with open ("table.txt", 'r') as table_file:
             style = kingdom_mapping[kingdom]
             ax1.scatter((size*0.001), (max_intron*0.001), color = style['color'])
             
-            ax1.legend()
+            #ax1.legend()  # need to learn how to make legends, for now logging the legends
             
             ax.scatter(log10(size), log10(max_intron), color = style['color'])
-            ax.legend()
+            #ax.legend()
             
         except:
             logger.error(f"failed to etract information for {line}")
@@ -72,8 +72,13 @@ ax3.pie(type_count.values(), labels = type_count.keys())
 fig4, ax4 = plt.subplots(1)
 ax4.pie(status_count.values(), labels = status_count.keys())
 
+logger.info(kingdom_count)
+logger.info(kingdom_mapping)
+logger.info(status_count)
+logger.info(type_count)
 
-# fig.savefig("genome_size_vs_max_intron")
-# fig1.savefig("genome_size_vs_max_intron_log")
-# fig2.savefig("kingdom_distribution")
-# fig3.savefig("type_distribution") 
+fig.savefig("genome_size_vs_max_intron_log")
+fig1.savefig("genome_size_vs_max_intron_kbp")
+fig2.savefig("kingdom_distribution")
+fig3.savefig("type_distribution") 
+fig4.savefig("status_distributio")
