@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
-
-This is a temporary script file.
+a module with functions for extracting genomic metadata in assembly report file as well as 
+information about giant introns (needs an already established threshold)
 """
 
 from plot_creator import create_hist, create_scatter
 import json
 
 
-def get_GintronInfo(genome, genome_id, threshold, plot = False):
+def get_g_intron_info(genome, genome_id, threshold, plot = False):
     """
     extracts giants introns and their relative positions with respect
     to the gene they belong to and stores that information in lists
@@ -66,6 +65,21 @@ def get_GintronInfo(genome, genome_id, threshold, plot = False):
 # I want to make it more efficient by searching for a list of keys
 
 def find_key(key, dictionary):
+    """
+    searches in a nested dictioanry until it finds the desired key and returns 
+    the values associated with it
+
+    Parameters
+    ----------
+    key : str
+    dictionary : python dict
+        a nested dictionary
+
+    Returns
+    -------
+    item : str
+    the values associated with the key
+    """
     if key in dictionary: return dictionary[key]
     for keys, values in dictionary.items():
         if isinstance(values, dict):
@@ -75,10 +89,13 @@ def find_key(key, dictionary):
             
    
 
-def get_genomeMetadata (gtf_loc):
+def get_genome_metadata (gtf_loc):
     """
     parameters: jason_file 
-    returns: genome_lenght, num_chromosome, genome_id
+    returns: 
+    tax_id, total_sequence_length, assembly_level, assembly_type, 
+    numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent
+
     """
     jsonl_file = gtf_loc.parent.parent / "assembly_data_report.jsonl"
     
@@ -86,11 +103,20 @@ def get_genomeMetadata (gtf_loc):
         for line in report:
             A = json.loads(line)
             
-            taxId = find_key("taxId", A)
-            NumChr = find_key("totalNumberOfChromosomes", A)
-            Type = find_key("assemblyType", A)
-            Status =  find_key("assemblyLevel", A)
-            genome_size = find_key("totalSequenceLength", A)
+            tax_num = find_key("taxId", A)
+            numChr = find_key("totalNumberOfChromosomes", A)
+            assembly_type = find_key("assemblyType", A)
+            assembly_level =  find_key("assemblyLevel", A)
+            total_sequence_length = find_key("totalSequenceLength", A)
+            num_contigs = find_key("numberOfContigs", A)
+            gc_percent = find_key("gcPercent", A)
+            contig_n50 = find_key("contigN50", A)
+            num_scaffolds = find_key("numberOfScaffolds", A)
+            scaffold_n50 = find_key("scaffoldN50", A)
+    
+    output = [
+        tax_num, total_sequence_length, assembly_level, assembly_type, 
+        numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent
+        ]
               
-    return (taxId, genome_size, Status, NumChr, Type)
-  
+    return output

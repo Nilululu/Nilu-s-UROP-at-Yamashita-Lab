@@ -5,13 +5,10 @@ and their annotated properties from a gtf files and stores it in a dictionary fo
 
 Created on Mon Feb 23 15:41:13 2026 by nilu
 """
-import logging
+
 from datetime import datetime
 import re
 
-#logger = logging.getLogger(__name__)
-#date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
-#logging.basicConfig(filename="error_parse_log{}.txt".format(date), level=logging.INFO)
 
 reg_attr = r'(\w+)\s+"([^"]*)"'
 def parse_attr_fields(text, reg=reg_attr):
@@ -36,13 +33,12 @@ def parse_attr_fields(text, reg=reg_attr):
                 results[this_key] = value.replace('"', "").strip() 
         except:
             print("failed to parse line {}".format(text))
-            #logging.error("failed to parse line {}".format(text))
             raise
     return results
 
 
 
-def extract_genesAndId(gtf_file):
+def extract_id_and_genes(gtf_file):
     """
     opens a gtf file and store all the genes, with their respective 
     transcripst, introns, and exons in dict

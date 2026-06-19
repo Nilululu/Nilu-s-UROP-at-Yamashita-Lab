@@ -10,9 +10,25 @@ from matplotlib import pyplot as plt
 from plot_creator import get_style
 from math import log10
 import logging
+import shutil
 
 logging.basicConfig(filename="info_test2_logger.txt", level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+# a function to join all the taxt files
+
+#list of text files to join in order
+
+
+text_file_list = ["table_0_6.txt", "table_6_12.txt", "table_18_24.txt", "table_12_18.txt", "table_24_30.txt"]
+
+with open ("table.txt", "wb") as destination:
+    
+    for table in text_file_list:
+        with open (table, 'rb') as source:
+            shutil.copyfileobj(source, destination)
+    
 
 
 fig, ax = plt.subplots(1)
@@ -30,11 +46,11 @@ with open ("table.txt", 'r') as table_file:
         
         try:
             fields = line.strip().split("\t")
-            status = fields[2]
-            kingdom = fields[8]
-            g_type = fields[3]
+            status = fields[5]
+            kingdom = fields[2]
+            g_type = fields[6]
             size = int(fields[4])
-            max_intron = int(fields[7])
+            max_intron = int(fields[13])
             
             if status not in status_count:
                 status_count[status] =1
@@ -63,6 +79,7 @@ with open ("table.txt", 'r') as table_file:
         except:
             logger.error(f"failed to etract information for {line}")
 
+ax.legend(labels = kingdom_mapping, bbox_to_anchor= (1.05, 1))
 fig2, ax2 = plt.subplots(1)
 ax2.pie(kingdom_count.values(), labels = kingdom_count.keys())
 
@@ -70,18 +87,18 @@ fig3, ax3 = plt.subplots(1)
 ax3.pie(type_count.values())
 
 # Place the legend outside the chart (top-right corner area)
-ax3.legend(labels = type_count.keys(), bbox_to_anchor=(1.05, 1), loc='upper left')
+ax3.legend( loc='upper left', labels = type_count.keys(), bbox_to_anchor=(1.05, 1))
 fig3.tight_layout()
 
 fig4, ax4 = plt.subplots(1)
 ax4.pie(status_count.values())
 
 # Place the legend outside the chart (top-right corner area)
-ax4.legend(labels= status_count.keys(), bbox_to_anchor=(1.05, 1), loc='upper left')
+ax4.legend(loc='upper left', labels= status_count.keys(), bbox_to_anchor=(1.05, 1))
 
 # Prevent the outside legend from getting cut off in the saved/rendered image
 fig4.tight_layout()
-
+print(kingdom_mapping)
 
 logger.info(kingdom_count)
 logger.info(kingdom_mapping)
@@ -93,3 +110,5 @@ fig1.savefig("genome_size_vs_max_intron_kbp")
 fig2.savefig("kingdom_distribution")
 fig3.savefig("type_distribution") 
 fig4.savefig("status_distributio")
+
+
