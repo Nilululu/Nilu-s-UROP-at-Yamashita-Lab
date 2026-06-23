@@ -3,9 +3,10 @@
 """
 Created on Mon Jun 15 11:08:23 2026 
 
-Scirpt for parralal analysis of genomic folder data, composed of two main function, 
-    write_to_table: exctracts the data of interest from genomic folder and writes it in a txt file 
-    mass_reading: loops over a group of genomic folders with write _to_table function 
+Scirpt for parralal analysis of genomic folder data, contains 
+    introns stats: extracts speciefic statistics about introns and return them in for of a list
+    write_to_table: exctracts the data of interest from genomic folder and returns it in form of a string
+    multiprocessor used to loop through all genomic files using write to table
     
 
 """
@@ -82,6 +83,7 @@ def intron_stats (genes):
         intron_stats = [max_intron, 
             min_intron, mean_intron,median_intron, sd_intron, q_25, q_50, q_75, q_95, q_99, q_999, q_9999, q_99999
             ]
+
     else:
         intron_stats = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
@@ -95,9 +97,9 @@ def intron_stats (genes):
 
 
     
-def write_to_table (gtf_file, table):
+def write_to_table (line):
     """
-    exctracts the data of interest from a genomic folder and writes it in a txt file 
+    exctracts the data of interest from a gtf file and writes it in a txt file 
     Writes following information about each genome in a line
     
     genome_id, name, kingdom, tax_id, total_sequence_length, assembly_level, assembly_type, 
@@ -108,14 +110,14 @@ def write_to_table (gtf_file, table):
     
     Parameters
     ----------
-    gtf_file : srt file path to genomic.gtf
+    line : a line from genomic_directory.csv containing the gtf file location
     table : txt file for writing the data
 
     Returns
     -------
     None
     """
-    
+    gtf_file= Path(line.split(",")[0])
     genome_id, genes = extract_id_and_genes(gtf_file)
     compute_intron(genes)
     
@@ -138,71 +140,30 @@ def write_to_table (gtf_file, table):
     for element in table_list:
         table_str = table_str + str(element) + "\t"
     
-    with open (table, 'a') as open_table:
-        open_table.write(table_str + "\n")
-    return
+    return table_str
         
-       
-        
-       
-        
-       
-        
-       
-        
-def mass_reading (n):
-    """
-    loops over a group of genomic files with write _to_table function 
 
-    Parameters
-    ----------
-    genomic_directory : a csv file containing the location of all gtf files
-    n : list of two integer, start, end indicies to read from in genomic_directory  
-
-    Returns
-    -------
-    None
-    """
-    
-    genomic_directory = "genomic_directory.csv"
-    with open(genomic_directory, 'r') as directory:
-        lines = directory.readlines()
-        
-        start = n[0]
-        end = n[1]
-        table = "table_{}_{}.txt".format(str(start), str(end))
-        
-        for line in lines[start:end]:
-            try:
-                
-                gtf_loc= Path(line.split(",")[0])
-                write_to_table(gtf_loc, table)
-                
-            except:
-                logger.error(f"failed to extract information for {line}")
-                raise
-    logger.info(table)      
-    return
-
-
-
-
-
-index_list = list(range(0,2641, 264))  # for cluster
-
-# index_list = list(range(0, 31, 6))   # for testing on my laptop
-
-for i in range(len(index_list)-1):
-    index_list[i] = [index_list[i], index_list[i+1]]
-
-index_list = index_list[:-1]    
     
 
-    
-if __name__ == '__main__':
+genomic_directory = "genomic_directory.csv"
 
-    with Pool(10) as p:
-        p.map(mass_reading, index_list)
+with open(genomic_directory, 'r') as directory:
+    lines = directory.readlines()
+    
+    if __name__ == '__main__':
+
+        with Pool(5) as p:
+            
+            
+            results = p.map(write_to_table, lines)
+     
+            with open("result_table.txt", 'w') as table:
+                for item in results:
+                    table.write(item)
+                    table.write("\n")
+           
+
+
 
 
     
