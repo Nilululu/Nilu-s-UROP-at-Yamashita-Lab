@@ -61,12 +61,15 @@ def intron_stats (genes):
                 start = item[0]
                 end = item [1]
                 length = end - start
+                if length < 0 :
+                    print(length)
                                             
                 introns.append(length)
     
     if introns: 
         max_intron = max(introns)
         min_intron = min(introns)
+        print("min", min_intron)
         mean_intron = int(np.mean(introns))
         median_intron = int(np.median(introns))
         sd_intron = int(np.std(introns))

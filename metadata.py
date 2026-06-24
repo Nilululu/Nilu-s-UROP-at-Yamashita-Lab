@@ -61,33 +61,34 @@ def get_g_intron_info(genome, genome_id, threshold, plot = False):
             print ("No giant introns for {genome_id} with the current threshold of", threshold)
     return (giant_introns, distance_from_start, distance_from_end)
 
-
-# I want to make it more efficient by searching for a list of keys
-
-def find_key(key, dictionary):
+            
+def find_key_multiple(keys_of_interest, dictionary, output_dictionary = None):
     """
-    searches in a nested dictioanry until it finds the desired key and returns 
-    the values associated with it
+    finds values of multiple keys inside a nested dictionary 
+    and returns a simple dictionary with keys of interest and their values
 
     Parameters
     ----------
-    key : str
-    dictionary : python dict
-        a nested dictionary
-
+    keys_of_interest : a list
+    dictionary : python nested dictionary 
+    
     Returns
     -------
-    item : str
-    the values associated with the key
+    output_dictionary
     """
-    if key in dictionary: return dictionary[key]
-    for keys, values in dictionary.items():
-        if isinstance(values, dict):
-            item = find_key(key, values)
-            if item is not None:
-                return item
-            
-   
+    
+    if output_dictionary is None:
+        output_dictionary = {}
+        
+    for key in keys_of_interest:
+        if key in dictionary:
+            output_dictionary[key] = dictionary[key]
+
+    for key, value in dictionary.items():
+        if isinstance(value, dict):
+            output_dictionary = find_key_multiple(keys_of_interest, value, output_dictionary)
+    
+    return output_dictionary
 
 def get_genome_metadata (gtf_loc):
     """
@@ -98,25 +99,31 @@ def get_genome_metadata (gtf_loc):
 
     """
     jsonl_file = gtf_loc.parent.parent / "assembly_data_report.jsonl"
-    
     with open(jsonl_file, 'r') as report:
         for line in report:
             A = json.loads(line)
             
-            tax_num = find_key("taxId", A)
-            numChr = find_key("totalNumberOfChromosomes", A)
-            assembly_type = find_key("assemblyType", A)
-            assembly_level =  find_key("assemblyLevel", A)
-            total_sequence_length = find_key("totalSequenceLength", A)
-            num_contigs = find_key("numberOfContigs", A)
-            gc_percent = find_key("gcPercent", A)
-            contig_n50 = find_key("contigN50", A)
-            num_scaffolds = find_key("numberOfScaffolds", A)
-            scaffold_n50 = find_key("scaffoldN50", A)
+            keys_of_interest = ["taxId", "totalNumberOfChromosomes", "assemblyType", 
+                                "assemblyLevel", "totalSequenceLength", "numberOfContigs", "gcPercent", 
+                                "contigN50", "numberOfScaffolds", "scaffoldN50"]
+            metadata = find_key_multiple(keys_of_interest, A)
+            
+            
+            tax_num = metadata["taxId"]
+            numChr = metadata["totalNumberOfChromosomes"]
+            assembly_type = metadata["assemblyType"]
+            assembly_level =  metadata["assemblyLevel"]
+            total_sequence_length = metadata["totalSequenceLength"]
+            num_contigs = metadata["numberOfContigs"]
+            gc_percent = metadata["gcPercent"]
+            contig_n50 = metadata["contigN50"]
+            num_scaffolds = metadata["numberOfScaffolds"]
+            scaffold_n50 = metadata["scaffoldN50"]
     
     output = [
         tax_num, total_sequence_length, assembly_level, assembly_type, 
         numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent
         ]
-              
+           
     return output
+

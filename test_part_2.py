@@ -12,6 +12,7 @@ from plot_creator import get_style
 from math import log10
 import logging
 import shutil
+import numpy as np
 
 logging.basicConfig(filename="info_test2_logger.txt", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,9 +35,12 @@ with open ("table.txt", "w") as destination:
 #initializing some figues and dictionaries 
 
 fig, ax = plt.subplots(1)
+ax.set_title("genome size vs max intron (scale = log bp)")
+
 fig1, ax1 = plt.subplots(1)
 ax1.set_title("genome size vs max intron (scale = kbp)")
-ax.set_title("genome size vs max intron (scale = log bp)")
+
+
 kingdom_count = dict()
 type_count = dict ()
 status_count = dict()
@@ -52,22 +56,31 @@ def add_counter(item, dictionary):
         dictionary[item] +=1
     else:
         dictionary[item] = 1 
-
+        
+boxplots_data = np.zeros((30, 13))
 
 #reading from the table text file
 with open ("table.txt", 'r') as table_file:
     
+    i = 0
     for line in table_file:
         if line.startswith("#"):  #skipping the info line
-            continue 
-        
+            continue
         try:
             fields = line.strip().split("\t")
+            
             assembly_status = fields[5]
             kingdom = fields[2]
             assembly_type = fields[6]
             size = int(fields[4])
+            
+            
+            boxplots_data[i, 0:13] = fields[13:26]
+            
             max_intron = int(fields[13])
+            
+            #printing min and q_25 for debugging 
+            print(int(fields[14]), int(fields[18]))
             
             add_counter(assembly_status, status_count)
             add_counter(kingdom, kingdom_count)
@@ -82,10 +95,9 @@ with open ("table.txt", 'r') as table_file:
             
             ax.scatter(log10(size), log10(max_intron), color = style['color'])
            
-            
+            i +=1
         except:
             logger.error(f"failed to etract information for {line}")
-
 
 # ax.legend(labels = kingdom_mapping, bbox_to_anchor= (1.05, 1))
 
@@ -132,5 +144,68 @@ fig1.savefig("genome_size_vs_max_intron_kbp")
 fig2.savefig("kingdom_distribution")
 fig3.savefig("type_distribution") 
 fig4.savefig("status_distributio")
+
+
+fig5, ax5 = plt.subplots()
+ax5.boxplot(boxplots_data[:, 5:])  #from q_25 to q_99999
+ax5.set_xticklabels(["25", "50", "75", "95", "99", "999", "9999", "99999"])
+ax5.set_xlabel("intron quantiles")
+ax5.set_title("length distribution of introns in each intron quantile across genomes")
+ax5.set_ylabel("Length (bp)")
+
+
+fig6, ax6 = plt.subplots()
+ax6.boxplot(boxplots_data[:, 5:], showfliers = False)  #from q_25 to q_99999
+ax6.set_xticklabels(["25", "50", "75", "95", "99", "999", "9999", "99999"])
+ax6.set_xlabel("intron quantiles")
+ax6.set_title("length distribution of introns in each intron quantile across genomes without outliers")
+ax6.set_ylabel("Length (bp)")
+#I want a figure with colored scatter points for all the above quantile statistics 
+
+
+"""
+ total_sequence_length,  max_intron, 
+ min_intron, mean_intron,median_intron, sd_intron, q_25, q_50, 
+ q_75, q_95, q_99, q_999, q_9999, q_99999
+ 
+ I have 12 colors 
+ 
+#a6cee3
+#1f78b4
+#b2df8a
+#33a02c
+#fb9a99
+#e31a1c
+#fdbf6f
+#ff7f00
+#cab2d6
+#6a3d9a
+#ffff99
+#b15928
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
