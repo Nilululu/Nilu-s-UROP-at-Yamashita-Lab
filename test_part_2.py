@@ -173,7 +173,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax5.boxplot((boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]])*0.001)
     ax5.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax5.set_xlabel("intron quantiles")
-    ax5.set_title("length distribution of introns in each intron quantile across genomes")
+    ax5.set_title("introns in each intron quantile across genomes")
     ax5.set_ylabel("Length (kbp)")
     fig5.tight_layout()
     
@@ -182,7 +182,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax6.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]))
     ax6.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax6.set_xlabel("intron quantiles")
-    ax6.set_title("length distribution of introns in each intron quantile across genomes")
+    ax6.set_title("introns in each intron quantile across genomes")
     ax6.set_ylabel("Length (log10)")
     fig6.tight_layout()
     
@@ -191,7 +191,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax7.boxplot((boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]])*0.001, showfliers = False)  #from q_25 to q_99999
     ax7.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax7.set_xlabel("intron quantiles")
-    ax7.set_title("length distribution of introns in each intron quantile across genomes without outliers")
+    ax7.set_title("introns in each intron quantile across genomes without outliers")
     ax7.set_ylabel("Length (kbp)")
     fig7.tight_layout()
     
@@ -200,7 +200,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax8.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]), showfliers = False)  #from q_25 to q_99999
     ax8.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax8.set_xlabel("intron quantiles")
-    ax8.set_title("length distribution of introns in each intron quantile across genomes without outliers")
+    ax8.set_title("introns in each intron quantile across genomes without outliers")
     ax8.set_ylabel("Length (log10)")
     fig8.tight_layout()
     
