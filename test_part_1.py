@@ -61,15 +61,14 @@ def intron_stats (genes):
                 start = item[0]
                 end = item [1]
                 length = end - start
-                if length < 0 :
-                    print(length)
+                # if length < 0 :
+                #     print(length)
                                             
                 introns.append(length)
     
     if introns: 
         max_intron = max(introns)
         min_intron = min(introns)
-        print("min", min_intron)
         mean_intron = int(np.mean(introns))
         median_intron = int(np.median(introns))
         sd_intron = int(np.std(introns))
@@ -89,7 +88,7 @@ def intron_stats (genes):
 
     else:
         intron_stats = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-    
+        
     return intron_stats
 
 
@@ -161,6 +160,14 @@ with open(genomic_directory, 'r') as directory:
             results = p.map(write_to_table, lines)
      
             with open("result_table.txt", 'w') as table:
+                
+                # adding column names to the table
+                info_line = "#genome_id name kingdom tax_id total_sequence_length assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent max_intron min_intron mean_intron median_intron sd_intron q_25 q_50 q_75 q_95 q_99 q_999 q_9999 q_99999"
+                info_line.replace(" ", "\t")
+                table.write(info_line)
+                table.write("\n")
+                
+                #writing the data 
                 for item in results:
                     table.write(item)
                     table.write("\n")
