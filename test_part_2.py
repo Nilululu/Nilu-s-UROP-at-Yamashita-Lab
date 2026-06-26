@@ -140,8 +140,9 @@ with open ("result_table.txt", 'r') as table_file:
         handle_1.append(ax1.scatter([], [], color = kingdom_mapping[item]["color"], label = item))
     
     ax.legend(handles = handle)
+    fig.tight_layout()
     ax1.legend(handles = handle_1)
-    
+    fig1.tight_layout()
 
 
     ##### MAKING MORE PLOTS
@@ -151,6 +152,7 @@ with open ("result_table.txt", 'r') as table_file:
     fig2, ax2 = plt.subplots(1)
     ax2.pie(kingdom_count.values(), labels = kingdom_count.keys())
     ax2.set_title("kingdom distribution")
+    fig2.tight_layout()
     
     #assembly type distribution of the data
     fig3, ax3 = plt.subplots(1)
@@ -173,6 +175,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax5.set_xlabel("intron quantiles")
     ax5.set_title("length distribution of introns in each intron quantile across genomes")
     ax5.set_ylabel("Length (kbp)")
+    fig5.tight_layout()
     
     #trying 10g10 scale
     fig6, ax6 = plt.subplots()
@@ -181,6 +184,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax6.set_xlabel("intron quantiles")
     ax6.set_title("length distribution of introns in each intron quantile across genomes")
     ax6.set_ylabel("Length (log10)")
+    fig6.tight_layout()
     
     #box plot for different quantiles + max and min without outliers
     fig7, ax7 = plt.subplots()
@@ -189,7 +193,8 @@ with open ("result_table.txt", 'r') as table_file:
     ax7.set_xlabel("intron quantiles")
     ax7.set_title("length distribution of introns in each intron quantile across genomes without outliers")
     ax7.set_ylabel("Length (kbp)")
-   
+    fig7.tight_layout()
+    
     #trying log10 scale
     fig8, ax8 = plt.subplots()
     ax8.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]), showfliers = False)  #from q_25 to q_99999
@@ -197,6 +202,7 @@ with open ("result_table.txt", 'r') as table_file:
     ax8.set_xlabel("intron quantiles")
     ax8.set_title("length distribution of introns in each intron quantile across genomes without outliers")
     ax8.set_ylabel("Length (log10)")
+    fig8.tight_layout()
     
     ##### Logging the counter dictionaries created
     logger.info(kingdom_count)
