@@ -3,12 +3,11 @@
 """
 Created on Mon Jun 15 11:08:23 2026 
 
-Scirpt for parralal analysis of genomic folder data, contains 
+Scirpt for getting general genomic folder data and writing it in results_table.txt, contains 
     introns stats: extracts speciefic statistics about introns and return them in for of a list
     write_to_table: exctracts the data of interest from genomic folder and returns it in form of a string
     multiprocessor used to loop through all genomic files using write to table
-    
-
+    Read write_to_table to learn about what data is being stored in the text file created
 """
 
 #pyhton modules 
@@ -101,8 +100,7 @@ def intron_stats (genes):
     
 def write_to_table (line):
     """
-    exctracts the data of interest from a gtf file and writes it in a txt file 
-    Writes following information about each genome in a line
+    exctracts the data of interest from a gtf file and returns it in the following order as a tab saperated string
     
     genome_id, name, kingdom, tax_id, total_sequence_length, assembly_level, assembly_type, 
     numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent, max_intron, 
@@ -113,11 +111,10 @@ def write_to_table (line):
     Parameters
     ----------
     line : a line from genomic_directory.csv containing the gtf file location
-    table : txt file for writing the data
 
     Returns
     -------
-    None
+    table_str: str
     """
     gtf_file= Path(line.split(",")[0])
     genome_id, genes = extract_id_and_genes(gtf_file)
