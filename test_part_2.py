@@ -89,7 +89,7 @@ kingdom_mapping = dict()
 
 with open ("result_table.txt", 'r') as table_file:
     
-    boxplots_data = np.zeros((len(table_file.readlines()), 13))
+    boxplots_data = np.zeros((2640, 13))
     
     i = 0 #used to write data in numpy arrays
     for line in table_file:
