@@ -129,10 +129,13 @@ def write_to_table (line):
     
     intron_stats_list = intron_stats(genes)
         
+    #storing all relevant information is table_list
     table_list = [genome_id, name, kingdom]
     table_list.extend(metadata)
     table_list.extend(intron_stats_list)
     
+    
+    #converting table_list to tab saperated str
     
     table_str = ""
     
@@ -153,9 +156,11 @@ with open(genomic_directory, 'r') as directory:
 
         with Pool(5) as p:
             
-            
+            #using 5 walkers to go over all the genomes in genomic_direcctory lines
             results = p.map(write_to_table, lines)
-     
+            
+            
+            #writing the results in a text file
             with open("result_table.txt", 'w') as table:
                 
                 # adding column names to the table
