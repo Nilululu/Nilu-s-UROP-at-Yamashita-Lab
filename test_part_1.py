@@ -22,7 +22,7 @@ from metadata import get_genome_metadata
 import taxonomy 
 
 
-logging.basicConfig(filename="info_test1_logger.txt", level=logging.DEBUG, force=True) 
+logging.basicConfig(filename="info_test1_logger.txt", level=logging.INFO, force=True) 
 logger = logging.getLogger(__name__)
 logger.info("the loggin initialized successfully")
 
