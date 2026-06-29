@@ -132,6 +132,10 @@ def compute_intron(genes):
                 for i in range(len(exons)-1):
                     intron_start= int(exons[i][1]) 
                     intron_end= int(exons[i+1][0])
+                    
+                    if intron_start > intron_end:   #to fix the issue of some introns having negetive lengths
+                        intron_start, intron_end = intron_end, intron_start
+                        
                     transcript_dico["introns"].append((intron_start, intron_end))
 
                     # depending we may have to modify that like use a set to get unique combination

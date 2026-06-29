@@ -136,11 +136,7 @@ def write_to_table (line):
     
     
     #converting table_list to tab saperated str
-    
-    table_str = ""
-    
-    for element in table_list:
-        table_str = table_str + str(element) + "\t"
+    table_str = ("\t").join(table_list)
     
     return table_str
         
@@ -160,19 +156,17 @@ with open(genomic_directory, 'r') as directory:
             results = p.map(write_to_table, lines)
             
             
-            #writing the results in a text file
-            with open("result_table.txt", 'w') as table:
-                
-                # adding column names to the table
-                info_line = "#genome_id name kingdom tax_id total_sequence_length assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent max_intron min_intron mean_intron median_intron sd_intron q_25 q_50 q_75 q_95 q_99 q_999 q_9999 q_99999"
-                info_line.replace(" ", "\t")
-                table.write(info_line)
-                table.write("\n")
-                
-                #writing the data 
-                for item in results:
-                    table.write(item)
-                    table.write("\n")
+        #writing the results in a text file
+        with open("result_table.txt", 'w') as table:
+            
+            # adding column names to the table
+            info_line = "#genome_id name kingdom tax_id total_sequence_length assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent max_intron min_intron mean_intron median_intron sd_intron q_25 q_50 q_75 q_95 q_99 q_999 q_9999 q_99999"
+            info_line.replace(" ", "\t")
+            table.write("{}\n".format(info_line))
+
+            #writing the data 
+            for item in results:
+                table.write("{}\n".format(item))
            
 
 
