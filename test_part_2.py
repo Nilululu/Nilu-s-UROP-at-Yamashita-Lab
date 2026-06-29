@@ -143,7 +143,7 @@ with open ("result_table.txt", 'r') as table_file:
     fig.tight_layout()
     ax1.legend(handles = handle_1)
     fig1.tight_layout()
-
+    print(boxplots_data)
 
     ##### MAKING MORE PLOTS
 
@@ -179,7 +179,7 @@ with open ("result_table.txt", 'r') as table_file:
     
     #trying 10g10 scale
     fig6, ax6 = plt.subplots()
-    ax6.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]))
+    ax6.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]+1))
     ax6.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax6.set_xlabel("intron quantiles")
     ax6.set_title("introns in each intron quantile across genomes")
@@ -197,7 +197,7 @@ with open ("result_table.txt", 'r') as table_file:
     
     #trying log10 scale
     fig8, ax8 = plt.subplots()
-    ax8.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]), showfliers = False)  #from q_25 to q_99999
+    ax8.boxplot(np.log10(boxplots_data[:, [1,5,6,7,8,9,10,11,12,0]]+1), showfliers = False)  #from q_25 to q_99999
     ax8.set_xticklabels(["min", "25", "50", "75", "95", "99", "999", "9999", "99999", "max"])
     ax8.set_xlabel("intron quantiles")
     ax8.set_title("introns in each intron quantile across genomes without outliers")

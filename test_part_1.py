@@ -136,6 +136,7 @@ def write_to_table (line):
     
     
     #converting table_list to tab saperated str
+    table_list = [str(x) for x in table_list]
     table_str = ("\t").join(table_list)
     
     return table_str
