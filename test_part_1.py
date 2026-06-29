@@ -15,6 +15,7 @@ import logging
 from multiprocessing import Pool
 import numpy as np
 from pathlib import Path
+import time
 
 #project modules 
 from extract import extract_id_and_genes, compute_intron 
@@ -136,13 +137,13 @@ def write_to_table (line):
     
     
     #converting table_list to tab saperated str
-    table_list = [str(x) for x in table_list]
+    table_list = list(map(str, table_list))
     table_str = ("\t").join(table_list)
     
     return table_str
         
 
-    
+start_time = time.time()  
 
 genomic_directory = "genomic_directory.csv"
 
@@ -170,7 +171,12 @@ with open(genomic_directory, 'r') as directory:
                 table.write("{}\n".format(item))
            
 
-
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        logger.info("start time: {}".format(start_time))
+        logger.info("end time: {}".format(end_time))
+        logger.info("duration: {}".format(duration))
 
 
     
