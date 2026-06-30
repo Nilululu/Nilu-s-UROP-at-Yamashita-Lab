@@ -117,30 +117,34 @@ def write_to_table (line):
     -------
     table_str: str
     """
-    gtf_file= Path(line.split(",")[0])
-    genome_id, genes = extract_id_and_genes(gtf_file)
-    compute_intron(genes)
     
-    metadata = get_genome_metadata(gtf_file)  #information about genome assembly inlcuding tax num,  sequence length, etc
-    
-    tax_dict = taxonomy.find_taxonomy(metadata[0], taxonomy_dict, tax_to_name)
-    kingdom = tax_dict["kingdom"]
-    name = tax_dict["species"]
-    
-    
-    intron_stats_list = intron_stats(genes)
+    try: 
+        gtf_file= Path(line.split(",")[0])
+        genome_id, genes = extract_id_and_genes(gtf_file)
+        compute_intron(genes)
         
-    #storing all relevant information is table_list
-    table_list = [genome_id, name, kingdom]
-    table_list.extend(metadata)
-    table_list.extend(intron_stats_list)
-    
-    
-    #converting table_list to tab saperated str
-    table_list = list(map(str, table_list))
-    table_str = ("\t").join(table_list)
-    
-    return table_str
+        metadata = get_genome_metadata(gtf_file)  #information about genome assembly inlcuding tax num,  sequence length, etc
+        
+        tax_dict = taxonomy.find_taxonomy(metadata[0], taxonomy_dict, tax_to_name)
+        kingdom = tax_dict["kingdom"]
+        name = tax_dict["species"]
+        
+        
+        intron_stats_list = intron_stats(genes)
+            
+        #storing all relevant information is table_list
+        table_list = [genome_id, name, kingdom]
+        table_list.extend(metadata)
+        table_list.extend(intron_stats_list)
+        
+        
+        #converting table_list to tab saperated str
+        table_list = list(map(str, table_list))
+        table_str = ("\t").join(table_list)
+        
+        return table_str
+    except:
+        logger.error("failed to extract information for the following genome {}".format(line))
         
 
 start_time = time.time()  
@@ -168,7 +172,8 @@ with open(genomic_directory, 'r') as directory:
 
             #writing the data 
             for item in results:
-                table.write("{}\n".format(item))
+                if item: 
+                    table.write("{}\n".format(item))
            
 
         end_time = time.time()

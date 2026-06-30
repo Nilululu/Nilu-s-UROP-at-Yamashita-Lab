@@ -14,6 +14,8 @@ import logging
 import numpy as np
 
 
+############# new goal, use panda library to make these grpahes!
+
 ##### logging file created
 logging.basicConfig(filename="info_test2_logger.txt", level=logging.INFO)
 logger = logging.getLogger(__name__)
