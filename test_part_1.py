@@ -145,7 +145,7 @@ def write_to_table (line):
         return table_str
     except:
         logger.error("failed to extract information for the following genome {}".format(line))
-        
+
 
 start_time = time.time()  
 

@@ -103,14 +103,20 @@ def get_genome_metadata (gtf_loc):
         for line in report:
             A = json.loads(line)
             
-            keys_of_interest = ["taxId", "totalNumberOfChromosomes", "assemblyType", 
+            keys_of_interest = ["taxId", "totalNumberOfChromosomes", "assemblyStatus", "assemblyType", 
                                 "assemblyLevel", "totalSequenceLength", "numberOfContigs", "gcPercent", 
                                 "contigN50", "numberOfScaffolds", "scaffoldN50"]
             metadata = find_key_multiple(keys_of_interest, A)
             
             
             tax_num = metadata["taxId"]
-            numChr = metadata["totalNumberOfChromosomes"]
+            
+            try:
+                numChr = metadata["totalNumberOfChromosomes"]
+            except:
+                numChr = "No Data"
+            
+            assembly_status = metadata["assemblyStatus"]
             assembly_type = metadata["assemblyType"]
             assembly_level =  metadata["assemblyLevel"]
             total_sequence_length = metadata["totalSequenceLength"]
@@ -121,7 +127,7 @@ def get_genome_metadata (gtf_loc):
             scaffold_n50 = metadata["scaffoldN50"]
     
     output = [
-        tax_num, total_sequence_length, assembly_level, assembly_type, 
+        tax_num, total_sequence_length, assembly_status, assembly_level, assembly_type, 
         numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent
         ]
            
