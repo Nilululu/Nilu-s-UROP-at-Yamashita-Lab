@@ -114,7 +114,7 @@ def get_genome_metadata (gtf_loc):
             try:
                 numChr = metadata["totalNumberOfChromosomes"]
             except:
-                numChr = "No Data"
+                numChr = "No_Data"
             
             assembly_status = metadata["assemblyStatus"]
             assembly_type = metadata["assemblyType"]
