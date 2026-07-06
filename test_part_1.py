@@ -103,7 +103,7 @@ def write_to_table (line):
     """
     exctracts the data of interest from a gtf file and returns it in the following order as a tab saperated string
     
-    genome_id, name, kingdom, tax_id, total_sequence_length, assembly_level, assembly_type, 
+    genome_id, name, kingdom, tax_id, total_sequence_length, assembly_status, assembly_level, assembly_type, 
     numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent, max_intron, 
     min_intron, mean_intron,median_intron, sd_intron, q_25, q_50, 
     q_75, q_95, q_99, q_999, q_9999, q_99999

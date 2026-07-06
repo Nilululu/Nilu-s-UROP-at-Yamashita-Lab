@@ -5,8 +5,8 @@
 Created on Mon Jun 15 11:08:23 2026 
 
 Scirpt for getting all introns in our genome folders 
-    write_to_table: exctracts the data of interest from genomic folder and writes it in text files name wokrer_{worker_id}.txt file
-    multiprocessor used to loop through all genomic files using write to table
+    get_id_and_introns: exctracts genome_id and genes from a gemoic file, and returns the id and all the introns of the genome in a list
+    multiprocessor used to loop through all genomic files using get_id_and_introns and record the output in introns.txt file
 
 """
 
@@ -14,9 +14,7 @@ Scirpt for getting all introns in our genome folders
 import logging
 from multiprocessing import Pool
 from pathlib import Path
-import os
-import matplotlib.pyplot as plt
-import numpy as np
+import time
 
 #project modules 
 from extract import extract_id_and_genes, compute_intron 
@@ -26,7 +24,7 @@ logging.basicConfig(filename="info_test3_logger.txt", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def write_to_table (line):
+def get_id_and_introns (line):
     """
     exctracts all the intron lenghts (accounting for multiple transcrips)from a gtf file and 
     writes it in a txt file
@@ -43,7 +41,7 @@ def write_to_table (line):
     genome_id, genes = extract_id_and_genes(gtf_file)
     compute_intron(genes)
     
-    introns = []   # to keep tracck of introns 
+    id_and_introns = [genome_id]   # to keep track of genome id and introns 
     
     #calculating intron lengths 
     for gene in genes:
@@ -52,69 +50,50 @@ def write_to_table (line):
                 start = item[0]
                 end = item [1]
                 length = end - start
-                # if length < 0 :      #for debugging 
-                #     print(length)
-                                            
-                introns.append(length)
-    
-    #writing genome id followed by all intron lengths for a genome in one line
-   
-    worker_id = os.getpid()
-    text_file = "worker" + str(worker_id) + ".txt"
-    
-    with open(text_file, "a") as table:   #how to change this so they all don't write in the same text file
-        table.write(genome_id)
-        table.write(", ")
-        table.write(str(introns).strip("[").strip("]"))
-        table.write("\n")
-        
-    return text_file 
-    
-
-genomic_directory = "genomic_directory.csv"
-
-with open(genomic_directory, 'r') as directory:
-    lines = directory.readlines()
-    
-    if __name__ == '__main__':
-
-        with Pool(5) as p:
-            tables = p.map(write_to_table, lines)
-        
-        tables = set(tables)
-        tables = list(tables)
-        
-        logger.info(tables)
-        print(tables)
-
-        all_introns = []
-        for file in tables:
-            with open(file, 'r') as table:
-                for line in table:
-                    
-                    line_introns = line.split(",")
-                    line_introns = [abs(int(x)) for x in line_introns[1:]]
-                    all_introns.extend(line_introns)
-
-                        
                 
-         
-        introns = np.array(all_introns)
-        #no bug till here
-        fig9, ax9 = plt.subplots(1)
-        ax9.violinplot(np.log10(introns))
+                id_and_introns.append(length)
+    
+    return id_and_introns
+    
+
+#using multiprocessor 
+    
+if __name__ == '__main__':
+    
+    #getting all the lines for workers for loop through
+    genomic_directory = "genomic_directory.csv"
+
+    with open(genomic_directory, 'r') as directory:
+        lines = directory.readlines()
+    
+    start_time = time.time()
+
+    #passing the lines
+    with Pool(5) as p:
+        results = p.map(get_id_and_introns, lines)
+    
+    #recording the output
+    with open("introns.txt", "w") as introns_file:
         
-   
-
-
-
-
-
-
-
-
-
-
-
-
+        for info in results:
+            info = list(map(str, info))
+            info = ("\t").join(info)
+            introns_file.write("{}\n".format(info))
+    
+    end_time = time.time()
+    duration = end_time - start_time
+    
+    #recording the time and duration
+    logger.info("start time: {}".format(start_time))   
+    logger.info("end time: {}".format(end_time))
+    logger.info("duration: {}".format(duration))
+    
+            
+               
+                
+                
+        
+        
+        
+ 
 

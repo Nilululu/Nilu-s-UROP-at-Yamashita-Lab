@@ -94,7 +94,7 @@ def get_genome_metadata (gtf_loc):
     """
     parameters: jason_file 
     returns: 
-    tax_id, total_sequence_length, assembly_level, assembly_type, 
+    tax_id, total_sequence_length, assembly_status, assembly_level, assembly_type, 
     numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent
 
     """
