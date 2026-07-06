@@ -111,10 +111,9 @@ def get_genome_metadata (gtf_loc):
             
             tax_num = metadata["taxId"]
             
-            try:
-                numChr = metadata["totalNumberOfChromosomes"]
-            except:
-                numChr = "No_Data"
+
+            numChr = metadata.get("totalNumberOfChromosomes", -1)
+
             
             assembly_status = metadata["assemblyStatus"]
             assembly_type = metadata["assemblyType"]

@@ -4,9 +4,11 @@
 """
 Created on Mon Jun 15 11:08:23 2026 
 
-Scirpt for getting all introns in our genome folders 
-    get_id_and_introns: exctracts genome_id and genes from a gemoic file, and returns the id and all the introns of the genome in a list
-    multiprocessor used to loop through all genomic files using get_id_and_introns and record the output in introns.txt file
+Script for getting all introns in our genome folders 
+    The main called multiprocessor on get_id_and_introns.
+
+    get_id_and_introns: extracts genome_id and genes from a genomic file, and returns the id and all the introns of the genome in a list.
+    Multiprocessor is used to loop through all genomic files using get_id_and_introns and record the output in introns.txt file
 
 """
 
@@ -72,6 +74,8 @@ if __name__ == '__main__':
     with Pool(5) as p:
         results = p.map(get_id_and_introns, lines)
     
+
+        
     #recording the output
     with open("introns.txt", "w") as introns_file:
         
