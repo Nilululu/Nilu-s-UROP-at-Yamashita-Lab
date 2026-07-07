@@ -110,20 +110,16 @@ def get_genome_metadata (gtf_loc):
             
             
             tax_num = metadata["taxId"]
-            
-
-            numChr = metadata.get("totalNumberOfChromosomes", -1)
-
-            
             assembly_status = metadata["assemblyStatus"]
             assembly_type = metadata["assemblyType"]
             assembly_level =  metadata["assemblyLevel"]
-            total_sequence_length = metadata["totalSequenceLength"]
-            num_contigs = metadata["numberOfContigs"]
-            gc_percent = metadata["gcPercent"]
-            contig_n50 = metadata["contigN50"]
-            num_scaffolds = metadata["numberOfScaffolds"]
-            scaffold_n50 = metadata["scaffoldN50"]
+            numChr = metadata.get("totalNumberOfChromosomes", -1)   
+            total_sequence_length = metadata.get("totalSequenceLength", -1)
+            num_contigs = metadata.get("numberOfContigs", -1)
+            gc_percent = metadata.get("gcPercent", -1)
+            contig_n50 = metadata.get("contigN50", -1)
+            num_scaffolds = metadata.get("numberOfScaffolds", -1)
+            scaffold_n50 = metadata.get("scaffoldN50", -1)
     
     output = [
         tax_num, total_sequence_length, assembly_status, assembly_level, assembly_type, 
