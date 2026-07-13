@@ -67,27 +67,29 @@ def intron_stats (genes):
                 introns.append(length)
     
     if introns: 
+        num_introns = len(introns)
         max_intron = max(introns)
         min_intron = min(introns)
         mean_intron = int(np.mean(introns))
         median_intron = int(np.median(introns))
         sd_intron = int(np.std(introns))
-        
+        q_10 = int(np.quantile(introns, 0.10))
         q_25 = int(np.quantile(introns, 0.25))
         q_50 = int(np.quantile(introns, 0.5))
         q_75 = int(np.quantile(introns, 0.75))
+        q_90 = int(np.quantile(introns, 0.90))
         q_95 = int(np.quantile(introns, 0.95))
         q_99 = int(np.quantile(introns, 0.99))
         q_999 = int(np.quantile(introns, 0.999))
         q_9999 = int(np.quantile(introns, 0.9999))
         q_99999  = int(np.quantile(introns, 0.99999))       
     
-        intron_stats = [max_intron, 
-            min_intron, mean_intron,median_intron, sd_intron, q_25, q_50, q_75, q_95, q_99, q_999, q_9999, q_99999
+        intron_stats = [num_introns, max_intron, 
+            min_intron, mean_intron,median_intron, sd_intron, q_10, q_25, q_50, q_75, q_90, q_95, q_99, q_999, q_9999, q_99999
             ]
 
     else:
-        intron_stats = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+        intron_stats = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         
     return intron_stats
 
@@ -103,10 +105,10 @@ def write_to_table (line):
     """
     exctracts the data of interest from a gtf file and returns it in the following order as a tab saperated string
     
-    genome_id, name, kingdom, tax_id, total_sequence_length, assembly_status, assembly_level, assembly_type, 
-    numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent, max_intron, 
-    min_intron, mean_intron,median_intron, sd_intron, q_25, q_50, 
-    q_75, q_95, q_99, q_999, q_9999, q_99999
+    genome_id, name, kingdom, phylum, tax_id, total_sequence_length, assembly_status, assembly_level, assembly_type, 
+    numChr, num_scaffolds, num_contigs, scaffold_n50, contig_n50, gc_percent, num_introns, max_intron, 
+    min_intron, mean_intron,median_intron, sd_intron, q_10, q_25, q_50, 
+    q_75, q_90, q_95, q_99, q_999, q_9999, q_99999
         
     
     Parameters
@@ -127,13 +129,14 @@ def write_to_table (line):
         
         tax_dict = taxonomy.find_taxonomy(metadata[0], taxonomy_dict, tax_to_name)
         kingdom = tax_dict["kingdom"]
+        phylum = tax_dict.get("phylum", "NA")
         name = tax_dict["species"]
         
         
         intron_stats_list = intron_stats(genes)
             
         #storing all relevant information is table_list
-        table_list = [genome_id, name, kingdom]
+        table_list = [genome_id, name, kingdom, phylum]
         table_list.extend(metadata)
         table_list.extend(intron_stats_list)
         
@@ -166,8 +169,8 @@ with open(genomic_directory, 'r') as directory:
         with open("result_table.txt", 'w') as table:
             
             # adding column names to the table
-            info_line = "#genome_id name kingdom tax_id total_sequence_length assembly_status assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent max_intron min_intron mean_intron median_intron sd_intron q_25 q_50 q_75 q_95 q_99 q_999 q_9999 q_99999"
-            info_line.replace(" ", "\t")
+            info_line = "#genome_id name kingdom phylum tax_id total_sequence_length assembly_status assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent num_introns max_intron min_intron mean_intron median_intron sd_intron q_10 q_25 q_50 q_75 q_90 q_95 q_99 q_999 q_9999 q_99999"
+            info_line = info_line.replace(" ", "\t")
             table.write("{}\n".format(info_line))
 
             #writing the data 
