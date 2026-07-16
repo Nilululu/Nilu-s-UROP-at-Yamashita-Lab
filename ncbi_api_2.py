@@ -183,8 +183,8 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         directory_dict[dict_key]= dict_val
         line_n += 1
         
-        if line_n > 30:  # for testing purpuses 
-           break        
+        # if line_n > 30:  # for testing purpuses 
+        #    break        
        
 
 csv_file_name = "genomic_directory_gca.csv"
