@@ -72,7 +72,6 @@ def download(base_url, id_, folder):
             file.write(response.content)
         logger.info('File downloaded successfully')
     else:
-        logger.error(f"Failed to download zip file {id_}, {name}\n")
         raise AssertionError
     return file_path
     
@@ -160,7 +159,12 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             continue 
         
         except:
-            raise
+            logger.error("enexpected error happened while unzipping the zip file")
+            file_path.unlink()
+            if extract_dir.is_dir():
+                shutil.rmtree(extract_dir)
+            id_set.remove(id_)
+            continue
 
         file_path.unlink()
         
