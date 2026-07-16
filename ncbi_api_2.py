@@ -103,6 +103,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         if id_.startswith("GCF"):   #skipping genomes that only have a refseq annotation
             continue 
         
+        id_set.add(id_)
 
         name = field[3].replace(" ", "_") + "_" + id_
         while time.time() - start < 0.3:
