@@ -152,7 +152,8 @@ def write_to_table (line):
 
 start_time = time.time()  
 
-genomic_directory = "genomic_directory.csv"
+#genomic_directory = "genomic_directory.csv"  #for refseq annotated ones
+genomic_directory = "genomic_directory_gca.csv"  #for independant annotations 
 
 with open(genomic_directory, 'r') as directory:
     lines = directory.readlines()
