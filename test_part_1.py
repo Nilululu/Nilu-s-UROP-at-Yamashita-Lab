@@ -46,7 +46,7 @@ def intron_stats (genes):
 
     Parameters
     ----------
-    genes : a dictionary (already includes intron start and end length insides)
+    genes : a dictionary (already includes intron start and end position inside)
 
     Returns : 
     -------
