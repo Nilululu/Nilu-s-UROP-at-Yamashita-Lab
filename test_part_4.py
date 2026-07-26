@@ -23,6 +23,7 @@ import time
 from extract import extract_id_and_genes, compute_intron 
 from metadata import get_genome_metadata
 import taxonomy 
+from itertools import cycle
 
 
 logging.basicConfig(filename="info_test4_logger.txt", level=logging.INFO, force=True) 
@@ -75,7 +76,7 @@ def gene_info(gene):
 
 
     
-def write_to_table (line):
+def write_to_table (line, text_file):
     
     try: 
         gtf_file= Path(line.split(",")[0])
@@ -95,47 +96,49 @@ def write_to_table (line):
             info = gene_info(genes[gene])
             
             gene_data = [gene_id, genome_id, kingdom, phylum, species]
+            gene_data.append(metadata[1])
             gene_data.extend(info)
-            gene_data.extend(metadata)
             
             all_genes.append(gene_data)
+         
+        with open (text_file, 'w') as file: 
+            for gene in all_genes:
+                gene = ("\t").join(gene)
+                file.write({"\n"}.format(gene))
             
-        
-        return all_genes
     except:
         logger.error("failed to extract information for the following genome {}".format(line))
-
-
+        raise
 start_time = time.time()  
 
 genomic_directory = "genomic_directory.csv"  #for refseq annotated ones
 #genomic_directory = "genomic_directory_gca.csv"  #for independant annotations 
 
 with open(genomic_directory, 'r') as directory:
+    
     lines = directory.readlines()
     
+    
     if __name__ == '__main__':
+        with open ("gene_1.txt", 'w') as f1, open("gene_2.txt", 'w') as f2, open("gene_3.txt", 'w') as f3, open("gene_4.txt", 'w') as f4:
+            
+            info_line = "#gene_id genome_id kingdom phylum species gene_len non_coding_len ratio max_intron max_intron_start max_intron_end total_sequence_length"
+            
+            info_line = info_line.replace(" ", "\t")
+            
+            f1.write("{}\n".format(info_line))
+            f2.write("{}\n".format(info_line))
+            f3.write("{}\n".format(info_line))
+            f4.write("{}\n".format(info_line))
 
-        with Pool(5) as p:
+        
+        with Pool(4) as p:
             
             #using 5 walkers to go over all the genomes in genomic_direcctory lines
-            results = p.map(write_to_table, lines)
+            arguments = zip(lines, cycle(["gene_1.txt", "gene_2.txt", "gene_3.txt", "gene_4.txt"]))
+            results = p.starmap(write_to_table, arguments)
             
             
-        #writing the results in a text file
-        with open("gene_table_refseq.txt", 'w') as table:   # !!!change to gene_table_gca for independent annotations
-            
-            # adding column names to the table
-            info_line = "#gene_id genome_id kingdom phylum species gene_len non_coding_len ratio max_intron max_intron_start max_intron_end tax_id total_sequence_length assembly_status assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent"
-            info_line = info_line.replace(" ", "\t")
-            table.write("{}\n".format(info_line))
-
-            #writing the data 
-            for genome in results:
-                if genome: 
-                    for gene in genome:
-                        table.write("{}\n".format(gene))
-           
 
         end_time = time.time()
         duration = end_time - start_time
