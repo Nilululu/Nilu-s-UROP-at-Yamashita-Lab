@@ -128,7 +128,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         # time after download used to  ward against API limit
         start = time.time()
         
-        logger.info(top, main_folder)
+        # logger.info(top, main_folder)
         
         zip_path = file_path
         extract_dir = file_path.parent / file_path.name.replace(".zip", "")
@@ -165,7 +165,7 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
             continue
             
 
-        logger.info("Found GTF:", genome_file[0])
+        logger.info(f"Found GTF: { genome_file[0]}")
         dict_key = genome_file[0]
         dict_val = name 
         directory_dict[dict_key]= dict_val

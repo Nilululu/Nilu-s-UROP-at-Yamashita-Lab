@@ -55,7 +55,7 @@ def gene_info(gene):
     max_intron_gene = 0
     max_start, max_end = 0, 0    #relative and normalized to gene position and len
     
-    for intron in gene["intron"]:
+    for intron in gene["introns"]:
         if intron:
             start, end = intron
             intron_len = end - start
@@ -103,12 +103,14 @@ def write_to_table (line, text_file):
          
         with open (text_file, 'w') as file: 
             for gene in all_genes:
+                gene = map(str, gene)
                 gene = ("\t").join(gene)
-                file.write({"\n"}.format(gene))
+                file.write("{}\n".format(gene))
             
     except:
         logger.error("failed to extract information for the following genome {}".format(line))
         raise
+
 start_time = time.time()  
 
 genomic_directory = "genomic_directory.csv"  #for refseq annotated ones
