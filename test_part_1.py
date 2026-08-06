@@ -127,7 +127,7 @@ def write_to_table (line):
         
         metadata = get_genome_metadata(gtf_file)  #information about genome assembly inlcuding tax num,  sequence length, etc
         
-        tax_dict = taxonomy.find_taxonomy(metadata[0], taxonomy_dict, tax_to_name)
+        tax_dict = taxonomy.find_taxonomy(metadata[0], taxonomy_dict, tax_to_name, {})
         kingdom = tax_dict["kingdom"]
         phylum = tax_dict.get("phylum", "NA")
         name = tax_dict["species"]

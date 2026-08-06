@@ -71,7 +71,7 @@ def find_taxonomy(tax_id, taxonomy_dict, tax_to_name, famline_dict = {}):
     famline_dictionary
 
     """
-    
+ 
     try:    
         parent_id, rank = taxonomy_dict[tax_id]
         name = tax_to_name [tax_id]
