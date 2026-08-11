@@ -85,7 +85,11 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                     #onyl take a longest intron!
                     max_intron = max(intron_lens)
                     
-                    data = [genome_id, tax_id, taxa["species"], taxa["kingdom"],(",").join(genome[gene]["db_xref"]), 
+                    db_xref = genome[gene]["db_xref"]
+                    if isinstance(db_xref, list):
+                        db_xref = (",").join(genome[gene]["db_xref"])
+                        
+                    data = [genome_id, tax_id, taxa["species"], taxa["kingdom"],db_xref, 
                             gene_length, (",").join(list(products)), max_intron]
                     
                     data = list(map(str, data))
