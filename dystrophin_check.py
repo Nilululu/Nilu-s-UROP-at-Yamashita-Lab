@@ -10,6 +10,12 @@ The findings are output in a table named "mammals_dystrophin.txt"
 
 """
 
+import logging
+
+
+logging.basicConfig(filename= "log_dystrophin.txt", level = logging.ERROR, force = True)
+logger = logging.getLogger(__name__)
+
 #importing internal modules
 from metadata import get_genome_metadata
 from pathlib import Path
@@ -28,6 +34,10 @@ taxonomy_dict = generate_taxonomy_dict(nodes)
 # using genomic dirsctory 
 with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.txt", 'w') as table:
     
+    header = "genome_id tax_id species kingdom db_xref gene_length products max_intron"
+    header = ("\t").join(header.split(" ")) 
+       
+    table.write("{}\n".format(header))
     for line in directory:
         fields = line.split(",")
         loc = Path(fields[0])
@@ -47,11 +57,15 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
             
             #searching for DMD
             for gene in genome:
-                #print(genome[gene]["products"])
-                if gene == "DMD":
+            
+                if gene.upper() == "DMD":
+                    if DMD_found: #there shouldn't be two dystrophin gene on the same genome
+                        logger.error("two DMD gene found on the same genomes, {}".format(genome_id))
+                    
                     DMD_found = True
+                    
                     start, end = genome[gene]["position"]
-                    length = end - start
+                    gene_length = end - start
                     
                     products = set()
                     for product in genome[gene]["products"]:
@@ -60,12 +74,7 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                         else:
                             products.add(product)
 
-                    data = [genome_id, tax_id, taxa["species"], taxa["kingdom"], 
-                            (",").join(genome[gene]["db_xref"]), start, end, length, (",").join(list(products))]
                     introns = genome[gene]["introns"]
-                    
-                    data = list(map(str, data))
-                    data = ("\t").join(data)
                     
                     intron_lens = []
                     for intron in introns:
@@ -73,19 +82,22 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                         ilen = iend - istart
                         intron_lens.append(ilen)
                     
-                    intron_lens = list(map (str, intron_lens))
-                    intron_lens= (",").join(intron_lens)
-              
-                    table.write(data + "\t" + intron_lens + "\n") 
+                    #onyl take a longest intron!
+                    max_intron = max(intron_lens)
+                    
+                    data = [genome_id, tax_id, taxa["species"], taxa["kingdom"],(",").join(genome[gene]["db_xref"]), 
+                            gene_length, (",").join(list(products)), max_intron]
+                    
+                    data = list(map(str, data))
+                    data = ("\t").join(data)
+                    table.write("{}\n".format(data)) 
             
             #taking notes of mammals with no dystrophin gene identified in them
             if not DMD_found:
                 data = [genome_id, tax_id, taxa["species"], taxa["kingdom"], "NO DMD Found"]
                 data = list(map(str, data))
                 data = ("\t").join(data)
-                table.write(data + "\t" + intron_lens + "\n") 
-                
-                
+                table.write("{}\n".format(data))
                 
             
             
