@@ -111,9 +111,9 @@ def extract_id_and_genes(gtf_file):
                 
             if feature == "exon":
                 
-                db_xref = attributes["db_xref"] #add to gene
+                db_xref = attributes.get("db_xref", "No db_xref") #add to gene
                 product = attributes.get("product", None)   # should be added to transcript or gene?
-                
+
                 genes[gene_id]["db_xref"] = db_xref
                 if product: 
                     genes[gene_id]["products"].add(product) 

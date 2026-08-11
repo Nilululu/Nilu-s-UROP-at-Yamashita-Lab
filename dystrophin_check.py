@@ -36,8 +36,9 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
         meta = get_genome_metadata(loc)
         tax_id = meta[0]
         taxa = find_taxonomy(tax_id, taxonomy_dict, tax_to_name, {})
-        
-        if taxa["class"] == "mammals": 
+
+        taxa_class = taxa.get("class", "No Class")
+        if taxa_class == "mammals": 
             #extracting all information for the genome
             genome_id, genome = extract_id_and_genes(loc)
             compute_intron(genome)
@@ -58,7 +59,7 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                             products.add("dystrophin")
                         else:
                             products.add(product)
-                            
+
                     data = [genome_id, tax_id, taxa["species"], taxa["kingdom"], 
                             (",").join(genome[gene]["db_xref"]), start, end, length, (",").join(list(products))]
                     introns = genome[gene]["introns"]
@@ -75,14 +76,14 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                     intron_lens = list(map (str, intron_lens))
                     intron_lens= (",").join(intron_lens)
               
-                    table.write(data + "\t" + intron_lens) 
+                    table.write(data + "\t" + intron_lens + "\n") 
             
             #taking notes of mammals with no dystrophin gene identified in them
             if not DMD_found:
                 data = [genome_id, tax_id, taxa["species"], taxa["kingdom"], "NO DMD Found"]
                 data = list(map(str, data))
                 data = ("\t").join(data)
-                table.write(data + "\t" + intron_lens) 
+                table.write(data + "\t" + intron_lens + "\n") 
                 
                 
                 
