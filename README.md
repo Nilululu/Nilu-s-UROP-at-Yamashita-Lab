@@ -15,6 +15,8 @@ ncbi_api.py:
     
     unzips and organize all successfully downloaded folders in ncbi_data_directory_0.1/
     
+    deletes folders with genoems that are not "current" in their status
+    
     logs warnings and errors in error_download_log.txt
     
     finds the location of the gtf file in the downlaoded folder and saves it in genomic_directory.csv
@@ -137,7 +139,18 @@ test_part_4.py
     
     No analysis have been done on the table, the script is also still under furthur work ....
 
-        
+debuggin.py (no longer needed)
+    
+    Summery: a script that I creakted to help me find a bug in ncbi_api. The bug was such that the number of gtfs we had was more then 
+    the number of genome folders, the fix was to not use genome names for folder naming as there might be old and current versions of 
+    the same genome in refseq and they will get downloaded in the same folder, instead we now use the name_genomeId convention for naming folders
+    
+dystrophin_check.py
+
+    Summery: This script will go through all NCBI refeq current genomes that we have and filter for mammals. 
+    Afterwards, it will try to find DMD (dystrophin) gene in each mammals and record said gene's information
+    The script takes note of mammals with no DMD gene in their annotation as well. The findings are output in 
+    a table named "mammals_dystrophin.txt"     
     
     
         
