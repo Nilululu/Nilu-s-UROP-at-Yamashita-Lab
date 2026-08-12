@@ -65,7 +65,7 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
             
                 if gene.upper() == "DMD":
                     if DMD_found: #there shouldn't be two dystrophin gene on the same genome
-                        logger.error("two DMD gene found on the same genomes, {}".format(genome_id))
+                        logger.error("two DMD gene found on the same genome, {}".format(genome_id))
                     
                     DMD_found = True
                     

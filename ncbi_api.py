@@ -14,6 +14,7 @@ import csv
 import zipfile
 import shutil 
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="error_download_log.txt", level=logging.WARNING)
@@ -71,6 +72,48 @@ def download(base_url, id_, folder):
     return file_path
     
 
+def status_helper(assembly_dict):
+    for key in assembly_dict:
+         if key == "assemblyStatus":
+             if assembly_dict["assemblyStatus"] == "current":
+                 return True
+             else:
+                 return
+     
+    for key, value in assembly_dict.items():
+        if isinstance(value, dict):
+            status  = status_helper(value)
+            if status:
+                return status
+             
+def get_status(folder_loc):
+    """
+    determine if a genome is a current genome or not
+    
+    ----------
+    Parameters
+    folder_loc: 
+        the ncbi genome folder
+
+    Returns
+    True or None 
+    """
+    
+    report_loc = list(folder_loc.rglob("assembly_data_report.jsonl"))[0]
+    
+    with open(report_loc, 'r') as report:
+        
+        for line in report:
+            assembly_dict = json.loads(line)
+            return status_helper(assembly_dict)
+        
+                
+    
+    
+    
+    
+    
+    
 
 line_n = 0
 
@@ -151,6 +194,13 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
 
         file_path.unlink()
         
+        current = get_status(extract_dir)
+        if not current:
+            logger.error(f"not a current genome, {id_}, {name}\n")
+            shutil.rmtree(extract_dir)
+            id_set.remove(id_)
+            continue
+            
         # Search inside extracted folder for genomic.gtf
         genome_file = list(extract_dir.rglob("genomic.gtf"))
 
@@ -159,7 +209,6 @@ with open ("ncbi_refseq-eukaryot.tsv", "r") as refseq_eukaryots:
         if not genome_file:
             
             logger.error(f"No genomic.gtf found, {id_}, {name}\n")
-            #!!!!!! also should be recorded 
             shutil.rmtree(extract_dir)
             id_set.remove(id_)
             continue
