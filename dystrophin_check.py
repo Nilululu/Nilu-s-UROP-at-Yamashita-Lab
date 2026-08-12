@@ -44,6 +44,11 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
         
         #filtering for mammals
         meta = get_genome_metadata(loc)
+        status = meta[2]
+        if status != "current":
+            logger.error("suppressed genome found: {}".format(loc))
+            continue
+                      
         tax_id = meta[0]
         taxa = find_taxonomy(tax_id, taxonomy_dict, tax_to_name, {})
 
@@ -95,7 +100,7 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                     data = list(map(str, data))
                     data = ("\t").join(data)
                     table.write("{}\n".format(data)) 
-            
+              
             #taking notes of mammals with no dystrophin gene identified in them
             if not DMD_found:
                 data = [genome_id, tax_id, taxa["species"], taxa["kingdom"], "NO DMD Found"]
