@@ -3,12 +3,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jun 15 11:08:23 2026 
+     
+Summery: a script to find all the introns in our data by going through all the gtf files whose location is stored in a csv directory
+Multiprocessor is used to loop through all genomic files using get_id_and_introns function and record the output in introns.txt file
 
-Script for getting all introns in our genome folders 
-    The main called multiprocessor on get_id_and_introns.
 
-    get_id_and_introns: extracts genome_id and genes from a genomic file, and returns the id and all the introns of the genome in a list.
-    Multiprocessor is used to loop through all genomic files using get_id_and_introns and record the output in introns.txt file
+Functions:
+    get_id_and_introns: 
+        extracts genome_id and genes from a genomic file, and returns the id and all the introns of the genome in a list.
 
 """
 

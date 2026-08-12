@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 """
 
-A script to go through multiple gtf files and exctract information about their genes and introns
+    Summery: goes through all gtf files (gets their location from a csv directory) and exctracts information about their genes and gene introns
 
-Information it logs about each gene
-gene_id genome_id kingdom phylum species gene_len non_coding_len ratio max_intron max_intron_start max_intron_end tax_id total_sequence_length assembly_status assembly_level assembly_type numChr num_scaffolds num_contigs scaffold_n50 contig_n50 gc_percent"
+    Information it stores about each gene include: 
+        gene_id genome_id kingdom phylum species gene_len non_coding_len ratio max_intron 
+        max_intron_start max_intron_end total_sequence_length"
+    
+    The results is outputted in 4 different text files (because of using 4 workers):
+        gene_1.txt gene_2.txt gene_3.txt gene_4.txt
+    
+    Still under work ....
 
-Still under work ....
 
 Created on Fri Jul 17 16:34:42 2026 by nilu
 """

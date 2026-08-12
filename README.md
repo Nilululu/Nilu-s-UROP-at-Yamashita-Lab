@@ -5,50 +5,9 @@ Hi, in this README I will give a overall review of my code structure, all the mo
 and the order they work. I will also indicate if I need help or feedback on anything specific
 
 
-    
-Scripts I would like to get your review on:
-    test_part_1.py 
-        for this one specifically do you think I still struggle to understand multiprocessor 
-        and put it to good use? if so what is it you think I haven't understood yet
-    test_part_2.py
-
-
-Parts I need help with:
-
-    Some introns have a below zero length, if you find extract module, compute introns function, 
-    you will see that I sort exons of each transcript by their start point before computing 
-    the introns, I don't know why this happens unless the end of one exon is after the start
-    of anotehr exon within the same transcript, is there a bug in my code, or does this have a 
-    biological meaning?
-    
-    When I make box plots in test_part_2.py with log10 sacle, some of the intial boxplots 
-    disapear (min, q_25, and q_50). You can see it in the figures saved in cluster, I don't know 
-    what is causing it. I know there is no log10 for negetive numbers (in the case of intron lenghts calculated negetive), 
-    but I am not sure if for example 50th quantile has negetive introns.
-
-Scripst I recently run in the cluster:
-
-    I run test_part_1.py and test_part_2.py
-        you should be able to see the info_test2_logger.txt as well as all the figure save in png format 
-        in cluster
-    Some thoughts:
-        for making figures, log10 or maybe any log seem to be much more informitive in graphes then kbp
-
-Scripts I am trying to finish and run by the time we meet on Monday
-    I want to make a test_part_3.py to make a violin plot of all the introns we have in our data 
-    next steps would be to make the same plot for different kingdoms maybe to see if the distribution is 
-    different between them
-    
-Goal out of this review and next week meetings:
-    1. I want to know if the way I get data and make plots is correct and effcient and then move to asking more 
-        questions
-    2. Rob helped me create a document for questions that might be good to ask, 
-        I know you have also added comments there. We can maybe talk about it 
-    3. talking about the way we want to define a giant intron
-
 ncbi_api.py:
     
-    Summery: an script to download all reseq annotated genome folders from NCBI using a tsv file with 
+    Summery: an script to download all refseq annotated genome folders from NCBI using a tsv file with 
     the accesion ids of genome folders and a API link
 
     files and folders created by running it: 
@@ -61,7 +20,11 @@ ncbi_api.py:
     finds the location of the gtf file in the downlaoded folder and saves it in genomic_directory.csv
     
     keeps track of accession ids of all successfully downloaded genomic folders and save them in id_set.txt
-    
+
+ncbi_api_2.py:
+   is the same as ncbi_api.py except that it downloads independent annotations!
+   files and folders created by running it: 
+       ncbi_data_directory_0.2, genomic_directory_gca.csv, error_dowload_log2.txt, id_set_gca.txt
     
 extract.py:
     
@@ -69,10 +32,10 @@ extract.py:
     uses a dictionary data structure
     
     Data Structure:
-        {gene_id: {"position": (start, end)", "transcrips":{}, "introns":set(), "exons":set(), "strand": "}}
+        {gene_id: {"position": (start, end)", "transcrips":{}, "introns":set(), "exons":set(), "strand": , "products":set(), "chr":}}
         
             the "transcript" key has the follwing structure to its associated value
-            {transcript_id: {"exons":[(start, end), ...] , "introns":[(start, end), ...]}}
+            {transcript_id: {"exons":[(start, end), ...] , "introns":[(start, end), ...]}, "product": }
     
     It works in two steps!
     To use it you should call extract_id_and_genes(gtf_file), this will give a dictionary with the data structure mentioned above
@@ -81,7 +44,7 @@ extract.py:
         
 taxonomy.py:
     a module to take a taaxonomy number and use taxonomy dataset to return a taxonomy dictionary
-    It needs names.dmp and nodes.dmp to be in th working directory 
+    It needs names.dmp and nodes.dmp to be in the working directory / have specified locations
     
     Functions:
         generate_taxonomy_dict:
@@ -140,7 +103,7 @@ test_part_1.py:
         
         A multiprocessor is used to run the write to table with 5 walkers and genomic_directory.csv as the input list
 
-test_part_2.py:
+test_part_2.py (OUTDATED, I use notebook to make my graphes now!):
     Summery: uses the text file created by test_part_1.py to make multiple graphes with the information at hand
     
     makes the following figures:
@@ -150,7 +113,30 @@ test_part_2.py:
     box plots for lenght distribution of introns in different quantiles across all genomes
         with kbp and log10 base pair scales
         with and without outliers
+
+test_part_3.py 
         
+    Summery: a script to find all the introns in our data by going through all the gtf files whose location is stored in a csv directory
+    Multiprocessor is used to loop through all genomic files using get_id_and_introns function and record the output in introns.txt file
+
+    
+    Functions:
+        get_id_and_introns: 
+            extracts genome_id and genes from a genomic file, and returns the id and all the introns of the genome in a list.
+
+test_part_4.py
+    
+    Summery: goes through all gtf files (gets their location from a csv directory) and exctracts information about their genes and gene introns
+
+    Information it stores about each gene include: 
+        gene_id genome_id kingdom phylum species gene_len non_coding_len ratio max_intron 
+        max_intron_start max_intron_end total_sequence_length"
+    
+    The results is outputted in 4 different text files (because of using 4 workers):
+        gene_1.txt gene_2.txt gene_3.txt gene_4.txt
+    
+    No analysis have been done on the table, the script is also still under furthur work ....
+
         
     
     
