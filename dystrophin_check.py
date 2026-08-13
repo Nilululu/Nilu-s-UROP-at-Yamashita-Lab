@@ -100,43 +100,44 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
                     data = list(map(str, data))
                     data = ("\t").join(data)
                     table.write("{}\n".format(data)) 
-                elif genome[gene]["gene"].upper() == "DMD":
-                    if DMD_found: #there shouldn't be two dystrophin gene on the same genome
-                        logger.error("two DMD gene found on the same genome, {}".format(genome_id))
-                    
-                    DMD_found = True
-                    
-                    start, end = genome[gene]["position"]
-                    gene_length = end - start
-                    
-                    products = set()
-                    for product in genome[gene]["products"]:
-                        if product.startswith("dystrophin"):
-                            products.add("dystrophin")
-                        else:
-                            products.add(product)
-
-                    introns = genome[gene]["introns"]
-                    
-                    intron_lens = []
-                    for intron in introns:
-                        istart, iend = intron
-                        ilen = iend - istart
-                        intron_lens.append(ilen)
-                    
-                    #onyl take a longest intron!
-                    max_intron = max(intron_lens)
-                    
-                    db_xref = genome[gene]["db_xref"]
-                    if isinstance(db_xref, list):
-                        db_xref = (",").join(genome[gene]["db_xref"])
+                elif genome[gene].get("gene"):
+                    if genome[gene].get("gene").upper() == "DMD":
+                        if DMD_found: #there shouldn't be two dystrophin gene on the same genome
+                            logger.error("two DMD gene found on the same genome, {}".format(genome_id))
                         
-                    data = [genome_id, tax_id, taxa["species"], taxa["kingdom"],db_xref, 
-                            gene_length, (",").join(list(products)), max_intron]
-                    
-                    data = list(map(str, data))
-                    data = ("\t").join(data)
-                    table.write("{}\n".format(data)) 
+                        DMD_found = True
+                        
+                        start, end = genome[gene]["position"]
+                        gene_length = end - start
+                        
+                        products = set()
+                        for product in genome[gene]["products"]:
+                            if product.startswith("dystrophin"):
+                                products.add("dystrophin")
+                            else:
+                                products.add(product)
+    
+                        introns = genome[gene]["introns"]
+                        
+                        intron_lens = []
+                        for intron in introns:
+                            istart, iend = intron
+                            ilen = iend - istart
+                            intron_lens.append(ilen)
+                        
+                        #onyl take a longest intron!
+                        max_intron = max(intron_lens)
+                        
+                        db_xref = genome[gene]["db_xref"]
+                        if isinstance(db_xref, list):
+                            db_xref = (",").join(genome[gene]["db_xref"])
+                            
+                        data = [genome_id, tax_id, taxa["species"], taxa["kingdom"],db_xref, 
+                                gene_length, (",").join(list(products)), max_intron]
+                        
+                        data = list(map(str, data))
+                        data = ("\t").join(data)
+                        table.write("{}\n".format(data)) 
                     
               
             #taking notes of mammals with no dystrophin gene identified in them
