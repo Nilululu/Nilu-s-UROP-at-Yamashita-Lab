@@ -87,6 +87,7 @@ def extract_id_and_genes(gtf_file):
    
         
             gene_id = attributes["gene_id"]
+            gene_name = attributes["gene"]
 
             #stores the gene_id as a dict with relevent keys
             if gene_id not in genes:
@@ -97,6 +98,7 @@ def extract_id_and_genes(gtf_file):
                 genes[gene_id]["products"] = set()
                 genes[gene_id]["strand"]= fields[6]
                 genes[gene_id]["chr"] = chromosome
+                genes[gene_id]["gene"] = gene_name
                 
                 
             if feature == "gene":
