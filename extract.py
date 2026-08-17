@@ -112,25 +112,38 @@ def extract_id_and_genes(gtf_file):
                 #gene_id "DMD"; transcript_id "XM_045050793.1"; db_xref "GeneID:101084937"; experiment "COORDINATES: polyA evidence [ECO: 0006239]"; gbkey "mRNA"; gene "DMD"; model_evidence "Supporting evidence includes similarity to: 40 Proteins, and 100% coverage of the annotated genomic feature by RNAseq alignments, including 3 samples with support  for all annotated introns"; product "dystrophin, transcript variant X7"; transcript_biotype "mRNA"; 
                 # transcripts and exons seems to have this information!
                 
+            if feature == "transcript":
+                
+                 db_xref = attributes.get("db_xref", "No db_xref") #add to gene
+                 product = attributes.get("product", None)   # should be added to transcript or gene?
+    
+                 genes[gene_id]["db_xref"] = db_xref
+                 if product: 
+                     genes[gene_id]["products"].add(product) 
+                 
+                 transcript_id = attributes["transcript_id"] 
+                 
+                 if transcript_id not in genes[gene_id]["transcripts"]:
+                     genes[gene_id]["transcripts"][transcript_id] = {"position": (start, end), "exons": [], "introns": [], "protein_id": set()}
+                     if product:
+                         genes[gene_id]["transcripts"][transcript_id]["product"] = product
+                         
+                
+                
             if feature == "exon":
                 
-                db_xref = attributes.get("db_xref", "No db_xref") #add to gene
-                product = attributes.get("product", None)   # should be added to transcript or gene?
+                transcript_id = attributes["transcript_id"] 
 
-                genes[gene_id]["db_xref"] = db_xref
-                if product: 
-                    genes[gene_id]["products"].add(product) 
-                
-                transcript_id = attributes["transcript_id"]  
                 # storing exon positions in its appropraite transcript
-
-                if transcript_id not in genes[gene_id]["transcripts"]:
-                    genes[gene_id]["transcripts"][transcript_id] = {"exons": [], "introns": []}
-                    if product:
-                        genes[gene_id]["transcripts"][transcript_id]["product"] = product
-                        
-                        
                 genes[gene_id]["transcripts"][transcript_id]["exons"].append((start, end))
+                
+            if feature == "CDS":
+
+                protein_id = attributes.get("protein_id", None)
+                transcript_id = attributes["transcript_id"] 
+                if protein_id:
+                    genes[gene_id]["transcripts"][transcript_id]["protein_id"].add(protein_id)
+           
             
    
     return (genome_id, genes)
