@@ -133,6 +133,16 @@ def extract_id_and_genes(gtf_file):
             if feature == "exon":
                 
                 transcript_id = attributes["transcript_id"] 
+       
+                if transcript_id not in genes[gene_id]["transcripts"]:
+                    genes[gene_id]["transcripts"][transcript_id] = {"position": (start, end), "exons": [], "introns": [], "protein_id": set()}
+                   
+                    db_xref = attributes.get("db_xref", "No db_xref") #add to gene
+                    product = attributes.get("product", None)   # should be added to transcript or gene?
+                    genes[gene_id]["db_xref"] = db_xref
+                    if product:
+                        genes[gene_id]["transcripts"][transcript_id]["product"] = product
+                        
 
                 # storing exon positions in its appropraite transcript
                 genes[gene_id]["transcripts"][transcript_id]["exons"].append((start, end))
