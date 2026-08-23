@@ -36,7 +36,7 @@ for item in df_sub.itertuples(index = False):
     name, protein_id = item
     
     #getting the file from NCBI
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}".format(protein_id)
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&retmode=xml".format(protein_id)
     responce = requests.get(url) 
     
     # using species name and protein id for naming!
