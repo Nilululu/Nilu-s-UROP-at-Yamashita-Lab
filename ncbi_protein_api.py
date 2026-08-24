@@ -40,7 +40,7 @@ for item in df_sub.itertuples(index = False):
     responce = requests.get(url) 
     
     # using species name and protein id for naming!
-    file_name = name.replace(" ", "_") + "_" + protein_id + ".asn1"
+    file_name = name.replace(" ", "_") + "_" + protein_id + ".xml"
     file = base_folder / file_name
     if responce.status_code == 200:
         with open(file, 'wb') as f:
