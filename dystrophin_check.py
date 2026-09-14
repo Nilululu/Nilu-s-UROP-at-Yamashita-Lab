@@ -3,57 +3,48 @@
 """
 Created on Thu Aug  6 14:23:23 2026
 
-This script will go through all NCBI refeq genomes that we have and filter for mammals. 
-Afterwards, it will try to find DMD (dystrophin) gene in each mammals and record gene information
+Goes through all NCBI refeq genomes downloaded on cluster and filter for mammals. 
+Afterwards, it finds DMD (dystrophin) gene in each mammal and record gene information
 The script takes note of mammals with no DMD gene as well. 
 The findings are output in a table named "mammals_dystrophin.txt"
 
 """
 
-# I need to break this script into multiple functions!
-
+#logger 
 import logging
-
-
 logging.basicConfig(filename= "log_dystrophin.txt", level = logging.ERROR, force = True)
 logger = logging.getLogger(__name__)
 
-#importing internal modules
+#project modules
 from metadata import get_genome_metadata
 from pathlib import Path
 from taxonomy import generate_tax_to_name, generate_taxonomy_dict, find_taxonomy
 from extract import extract_id_and_genes, compute_intron
 
 
-#generate taxonomic dictionary
+#set up taxonomy dicts
 names = "names.dmp"
 nodes = "nodes.dmp"
 tax_to_name = generate_tax_to_name(names)
 taxonomy_dict = generate_taxonomy_dict(nodes)
 
 
-
-
 def identify_mammal (line):
     """
-    takes a line from genomic_directory.csv, gets the metadata of that genome 
-    and checks for current mammals 
+    takes a line from genomic_directory.csv and filters for current mammals genomes
 
     Parameters
-    ----------
-    line : Str : a line from genomic_directory.csv
+    - line : Str : a line from genomic_directory.csv
 
     Returns
-    -------
-    None: if it is not a current genome that belons to a mammal
-    
-    otherwise: 
+    - None: if it is not a current genome that belons to a mammal
+    - otherwise: 
         loc : Str : location of genomic.gtf
         tax_id : taxonomic id of the genome
         taxa : a dictionary containing taxonomic lineage 
     """
-    #parsing a line from genomic_directory
-    fields = line.split(",")
+    
+    fields = line.split(",") #taking gtf location from genomic_directory line
     loc = Path(fields[0])
     
     #finding tax_id and status
@@ -66,7 +57,7 @@ def identify_mammal (line):
     tax_id = meta[0]
     taxa = find_taxonomy(tax_id, taxonomy_dict, tax_to_name, {})
     
-    #checking for mammals 
+    #filtering for mammals 
     taxa_class = taxa.get("class", "No Class")
     if taxa_class == "mammals": 
         return loc, tax_id, taxa
@@ -74,46 +65,33 @@ def identify_mammal (line):
     return 
    
     
-   
     
 def DMD_parse (gene):
     """
-    takes a DMD gene from a genome dictionary created by extract module, 
-    and take information of interest out of it
+    takes a DMD gene from a genome dictionary created by extract module to output info of interest
 
     Parameters
-    ----------
-    gene : python dict
+    - gene : python dict
 
     Returns
-    -------
-    info : python list : db_xref, gene_length, max_intron, protein_id
+    - info : python list : db_xref, gene_length, max_intron, protein_id
     """
     
     start, end = gene["position"]
     gene_length = end - start
-    
-    # # do we need this since DMD gene makes dystrophin only? need to check with Romain
-    # products = set()
-    # for product in gene["products"]:
-    #     if product.startswith("dystrophin"):
-    #         products.add("dystrophin")
-    #     else:
-    #         products.add(product)
-            
-    #finding the max intron on DMD gene
+
     introns = gene["introns"]
-    
     intron_lens = []
+    
     for intron in introns:
         istart, iend = intron
         ilen = iend - istart
         intron_lens.append(ilen)
 
     max_intron = max(intron_lens)
-    #how to find which number intron is the longest one?
+    #how to find which number intron is the longest one? probably an index finder func
     
-    #getting gene ids (might have multiple if the gene canbe found in multiple databases)
+    #taking note of gene ids availabel in other databases
     db_xref = gene["db_xref"]
     if isinstance(db_xref, list):
         db_xref = (",").join(gene["db_xref"])
@@ -127,15 +105,23 @@ def DMD_parse (gene):
         if trc_len > max_trc_len:
             max_trc, max_trc_len = trc, trc_len
     
-    #can have two protein ids if both automatic and curated annotations were done for the same protein 
-    protein_id = gene["transcripts"][max_trc]["protein_id"]
-        
+    protein_id = gene["transcripts"][max_trc]["protein_id"]   
     info = [db_xref, gene_length, max_intron, (",").join(list(protein_id))]
     
     return info
+
+
+
+
+
+
+
+
+       
         
-        
-# using genomic dirsctory and makign a table for data I will use
+# genomic dirsctory has name and location of all refseq genomes on cluster 
+# we will store key data point in a table text file
+
 with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.txt", 'w') as table:
     
     #making table header
@@ -145,14 +131,13 @@ with open ("genomic_directory.csv", 'r') as directory, open("mammals_dystrophin.
     
     
     for line in directory:
-        
-        # will only exist if the genome is a current mammal genome
-        mammal = identify_mammal(line)
+        mammal = identify_mammal(line)   # will return None for non-mammals
         if not mammal:
             continue
                 
         loc, tax_id, taxa = mammal
-        #extracting all information for the genome
+        
+        #making a dictionary from the gtf file
         genome_id, genome = extract_id_and_genes(loc)
         compute_intron(genome)
         DMD_found = False
