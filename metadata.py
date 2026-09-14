@@ -4,7 +4,7 @@ a module with functions for extracting genomic metadata in assembly report file 
 information about giant introns (needs an already established threshold)
 """
 
-from plot_creator import create_hist, create_scatter
+
 import json
 
 
