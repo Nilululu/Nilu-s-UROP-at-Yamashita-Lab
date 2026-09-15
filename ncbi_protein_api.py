@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # base_folder = pathlib.Path(pathlib.Path.cwd() / "ncbi_DMD_proteins")
 # base_folder.mkdir(exist_ok =  True)
 
-df = pd.read_csv("mammals_utrophin.txt", sep = "\t", index_col = False)
+df = pd.read_csv("mammals_utrn.txt", sep = "\t", index_col = False)
 df_sub = df[["species","protein_id"]]
 
 #creating the folder that will store the protein asn1 files 
