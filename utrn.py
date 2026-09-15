@@ -15,7 +15,7 @@ The findings are output in a table, name TBD
 import logging
 
 
-logging.basicConfig(filename= "log_utrohopin.txt", level = logging.ERROR, force = True)
+logging.basicConfig(filename= "log_utrophin.txt", level = logging.ERROR, force = True)
 logger = logging.getLogger(__name__)
 
 #importing internal modules

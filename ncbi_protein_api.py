@@ -16,18 +16,29 @@ import time
 logging.basicConfig(filename = "ncbi_protein_logger.txt", level = logging.INFO, force = True)
 logger = logging.getLogger(__name__)
 
-#reading the table into a panda table
-df = pd.read_csv("mammals_dystrophin.txt", sep = "\t", index_col = False)
+
+#### used to downlaod DMD fasta files
+# #reading the table into a panda table
+# df = pd.read_csv("mammals_dystrophin.txt", sep = "\t", index_col = False)
+# df_sub = df[["species","protein_id"]]
+
+# #creating the folder that will store the protein asn1 files 
+# base_folder = pathlib.Path(pathlib.Path.cwd() / "ncbi_DMD_proteins")
+# base_folder.mkdir(exist_ok =  True)
+
+df = pd.read_csv("mammals_utrophin.txt", sep = "\t", index_col = False)
 df_sub = df[["species","protein_id"]]
 
 #creating the folder that will store the protein asn1 files 
-base_folder = pathlib.Path(pathlib.Path.cwd() / "ncbi_DMD_proteins")
+base_folder = pathlib.Path(pathlib.Path.cwd() / "ncbi_utrn_proteins")
 base_folder.mkdir(exist_ok =  True)
+
+
 
 #making sure we don't request more them 3 requests per second
 start  =time.time()
 
-#going through every species DMD protein_id in the table
+#going through every protein_id in the table
 for item in df_sub.itertuples(index = False):
     
     while time.time() - start < 0.4:
